@@ -1,0 +1,31 @@
+label{
+	display: block;
+	font-size: 13px;
+	font-weight: 300;
+}
+
+input, textarea{
+	display: block;
+	margin-bottom: 15px;
+	padding: 5px 2%;
+	width: 96%;
+}
+
+input[type="file"]{
+	padding-left: 0;
+}
+
+textarea{
+	height: 150px;
+}
+
+input.botao{
+	width: auto;
+}
+
+.login{
+	margin-top: 150px;
+	border-radius: 10px;
+	background-color: aqua;
+	border: 1px solid aqua;
+}
