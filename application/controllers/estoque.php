@@ -30,7 +30,7 @@ class Estoque extends CI_Controller
     $dados['vendas'] = $vendas->num;
     $dados['vendas_mensal'] = $x;
     $dados['func'] = $func->num;
-    $dados['titulo'] = 'Nome da Empresa';
+    $dados['titulo'] = 'All tech';
     $dados['id'] = $this->session->userdata('user_id');
     $dados['user'] = $this->session->userdata('user_name');
     $dados['tarefas'] = $this->model->get_tarefa($this->session->userdata('user_id'));
@@ -42,14 +42,14 @@ class Estoque extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do Site';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('estoque/cad_prod', $dados);
   }
 
   public function vender()
   {
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Cadastro de venda de produtos';
     $dados['prod'] = $this->model->select('produtos');
     $dados['user'] = $this->session->userdata('user_name');
@@ -145,7 +145,7 @@ class Estoque extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Funcinarios de Estoque';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('estoque/cadastro', $dados);
@@ -211,7 +211,7 @@ class Estoque extends CI_Controller
       $dados['lista'] = '';
     }
     $dados['periodo'] = 'Diário';
-    $dados['titulo'] = 'Nome da Empresa';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $dados['h2'] = 'Lista de Vendas Diária';
     $this->load->view('estoque/vendas', $dados);
@@ -241,7 +241,7 @@ class Estoque extends CI_Controller
       $dados['lista'] = '';
     }
     $dados['periodo'] = 'Mensal';
-    $dados['titulo'] = 'Nome da Empresa';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $dados['h2'] = 'Lista de Vendas Mensal';
     $this->load->view('estoque/vendas', $dados);
@@ -249,7 +249,7 @@ class Estoque extends CI_Controller
 
   public function produtos()
   {
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Lista de Produtos em estoque';
     $dados['prod'] = $this->model->select('produtos');
     $dados['user'] = $this->session->userdata('user_name');
@@ -260,7 +260,7 @@ class Estoque extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Quadro de Funcionários do setor de estoque';
     $dados['func'] = $this->model->select('funcionarios');
     $dados['user'] = $this->session->userdata('user_name');

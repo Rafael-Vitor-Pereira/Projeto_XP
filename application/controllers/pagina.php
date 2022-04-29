@@ -10,7 +10,6 @@ class Pagina extends CI_Controller
 		$this->load->model('db_model', 'model');
 		date_default_timezone_set('america/sao_paulo');
 		date_default_timezone_get();
-		$empresa = 'Nome da empresa';
 	}
 
 	public function index()
@@ -88,7 +87,7 @@ class Pagina extends CI_Controller
 			}
 		} else {
 			//Carrega view
-			$dados_login['titulo'] = 'Nome da Empresa';
+			$dados_login['titulo'] = 'All tech';
 			$dados_login['h2'] = 'Acesso ao sistema';
 			$this->load->view('home', $dados_login);
 		}
@@ -121,7 +120,7 @@ class Pagina extends CI_Controller
 		} else {
 			$msg = 0;
 		}
-		$dados['titulo'] = 'Nome da Empresa';
+		$dados['titulo'] = 'All tech';
 		$dados['h2'] = 'Caixa de entrada';
 		$dados['logado'] = $this->session->userdata('user_acess');
 		$dados['user'] = $this->session->userdata('user_name');
@@ -160,7 +159,7 @@ class Pagina extends CI_Controller
 			$msg = 0;
 		}
 
-		$dados['titulo'] = 'Nome da Empresa';
+		$dados['titulo'] = 'All tech';
 		$dados['logado'] = $this->session->userdata('user_acess');
 		$dados['user'] = $this->session->userdata('user_name');
 		$dados['id'] = $this->session->userdata('user_id');
@@ -207,7 +206,7 @@ class Pagina extends CI_Controller
 			$page = 'financeiro/ler_msg';
 		}
 
-		$dados['titulo'] = 'Nome da Empresa';
+		$dados['titulo'] = 'All tech';
 		$dados['user'] = $this->session->userdata('user_name');
 		$dados['id'] = $this->session->userdata('user_id');
 		$dados['msg'] = $msg;
@@ -244,7 +243,7 @@ class Pagina extends CI_Controller
 			$msg = 0;
 		}
 
-		$dados['titulo'] = 'Nome da Empresa';
+		$dados['titulo'] = 'All tech';
 		$dados['h2'] = 'Lixeira';
 		$dados['logado'] = $this->session->userdata('user_acess');
 		$dados['user'] = $this->session->userdata('user_name');
@@ -282,7 +281,7 @@ class Pagina extends CI_Controller
 			$msg = 0;
 		}
 
-		$dados['titulo'] = 'Nome da Empresa';
+		$dados['titulo'] = 'All tech';
 		$dados['h2'] = 'Mensagens enviadas';
 		$dados['logado'] = $this->session->userdata('user_acess');
 		$dados['user'] = $this->session->userdata('user_name');
@@ -335,7 +334,7 @@ class Pagina extends CI_Controller
 			}
 		}
 
-		$dados['titulo'] = 'Nome da Empresa';
+		$dados['titulo'] = 'All tech';
 		$dados['h2'] = 'Escrever';
 		$dados['logado'] = $this->session->userdata('user_acess');
 		$dados['user'] = $this->session->userdata('user_name');
@@ -367,7 +366,7 @@ class Pagina extends CI_Controller
 			$msg = 0;
 		}
 
-		$dados['titulo'] = 'Nome da Empresa';
+		$dados['titulo'] = 'All tech';
 		$dados['h2'] = 'Rascunhos';
 		$dados['logado'] = $this->session->userdata('user_acess');
 		$dados['user'] = $this->session->userdata('user_name');
@@ -380,7 +379,7 @@ class Pagina extends CI_Controller
 	{
 		verifica_login();
 
-		$dados['titulo'] = 'Nome do site';
+		$dados['titulo'] = 'All tech';
 		$dados['h2'] = 'Lista de Contatos';
 		$dados['logado'] = $this->session->userdata('user_login');
 		$dados['lista'] = $this->model->select('usuario');
@@ -416,7 +415,7 @@ class Pagina extends CI_Controller
 			$dados['user_name'] = $result->login;
 		}
 		$dados['h2'] = 'Informações do Usuário';
-		$dados['titulo'] = 'Nome da empresa';
+		$dados['titulo'] = 'All tech';
 		$dados['access'] = $this->session->userdata('user_acess');
 		$dados['user'] = $this->session->userdata('user_name');
 		$this->load->view('credenciais', $dados);
@@ -434,7 +433,7 @@ class Pagina extends CI_Controller
 			$dados['user'] = $result->nome;
 		}
 		$dados['h2'] = 'Informações do Usuário';
-		$dados['titulo'] = 'Nome da empresa';
+		$dados['titulo'] = 'All tech';
 		$dados['access'] = $this->session->userdata('user_acess');
 		$this->load->view('editar', $dados);
 	}

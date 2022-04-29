@@ -62,7 +62,13 @@
                   <div class="row">
                     <div class="form-group col-6">
                       <label for="setor">Setor:</label>
-                      <input type="text" name="setor" id="setor" class="form-control" placeholder="Setor do Funcionário">
+                      <select name="setor" id="setor" class="form-control">
+                        <option value=""> --------------- </option>
+                        <option value="Administrativo">Administrativo</option>
+                        <option value="RH">Recursos Humanos</option>
+                        <option value="Estoque">Estoque</option>
+                        <option value="Financeiro">Financeiro</option>
+                      </select>
                     </div>
                   </div>
                 </div>

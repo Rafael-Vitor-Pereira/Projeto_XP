@@ -81,7 +81,7 @@ class Admin extends CI_Controller
     $dados['valor_diario'] = $somaValor;
     $dados['valor_mensal'] = $somaValorMensal;
     $dados['func'] = $func->num;
-    $dados['titulo'] = 'Nome da Empresa';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $dados['tarefas'] = $this->model->get_tarefa($this->session->userdata('user_id'));
     $dados['h2'] = 'Setor Administrativo';
@@ -129,7 +129,7 @@ class Admin extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do Site';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('admin/cadastrar', $dados);
   }
@@ -138,21 +138,21 @@ class Admin extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do Site';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('admin/cad_prod', $dados);
   }
 
   public function cad_func()
   {
-    $dados['titulo'] = 'Nome do Site';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('admin/cad_func', $dados);
   }
 
   public function cad_custo()
   {
-    $dados['titulo'] = 'Nome do Site';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('admin/cad_custo', $dados);
   }
@@ -353,7 +353,7 @@ class Admin extends CI_Controller
 
   public function vender()
   {
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Cadastro de venda de produtos';
     $dados['prod'] = $this->model->select('produtos');
     $dados['user'] = $this->session->userdata('user_name');
@@ -384,7 +384,7 @@ class Admin extends CI_Controller
       $dados['lista'] = '';
     }
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $dados['h2'] = 'Lista de Vendas Diária';
     $dados['teste'] = 'diario';
@@ -394,7 +394,7 @@ class Admin extends CI_Controller
   public function editar($id)
   {
     $dados['func'] = $this->model->dados('funcionarios', $id);
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('admin/editar', $dados);
   }
@@ -460,7 +460,7 @@ class Admin extends CI_Controller
       $dados['lista'] = '';
     }
 
-    $dados['titulo'] = 'Nome da Empresa';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $dados['h2'] = 'Lista de Vendas Mensal';
     $dados['teste'] = 'mensal';
@@ -496,7 +496,7 @@ class Admin extends CI_Controller
     } else {
       $num = $y;
     }
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Balanço Mensal';
     $dados['quant'] = $num;
     $dados['custo'] = $custo;
@@ -509,7 +509,7 @@ class Admin extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Quadro de Funcionários';
     $dados['func'] = $this->model->select('funcionarios');
     $dados['user'] = $this->session->userdata('user_name');
@@ -522,7 +522,7 @@ class Admin extends CI_Controller
 
     $custo = $this->model->select('custos', date('Y-m-d'));
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Custos Diários';
     $dados['custo'] = $custo;
     $dados['user'] = $this->session->userdata('user_name');
@@ -540,7 +540,7 @@ class Admin extends CI_Controller
       $custo = $this->model->intervalo('custos', date('Y-m'));
     }
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Custos Mensais';
     $dados['custo'] = $custo;
     $dados['user'] = $this->session->userdata('user_name');
@@ -549,7 +549,7 @@ class Admin extends CI_Controller
 
   public function produtos()
   {
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Lista de Produtos em estoque';
     $dados['prod'] = $this->model->select('produtos');
     $dados['user'] = $this->session->userdata('user_name');
@@ -562,7 +562,7 @@ class Admin extends CI_Controller
 
     $num = $this->model->count('usuario');
     $dados['usuario'] = $this->model->select('usuario');
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Lista de Bloqueio';
     $dados['id'] = $this->session->userdata('user_id');
     $dados['num'] = intval($num->num);

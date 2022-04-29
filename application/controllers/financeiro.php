@@ -46,7 +46,7 @@ class Financeiro extends CI_Controller
     $dados['custo'] = $somaCusto;
     $dados['valor'] = $somaValor;
     $dados['func'] = $func->num;
-    $dados['titulo'] = 'Nome da Empresa';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $dados['tarefas'] = $this->model->get_tarefa($this->session->userdata('user_id'));
     $dados['h2'] = "Setor Financeiro";
@@ -72,7 +72,7 @@ class Financeiro extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Funcinarios de Estoque';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('financas/cadastro', $dados);
@@ -82,7 +82,7 @@ class Financeiro extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('financas/cad_custo', $dados);
   }
@@ -154,7 +154,7 @@ class Financeiro extends CI_Controller
 
     $custo = $this->model->select('custos', date('Y-m-d'));
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Custos Diários';
     $dados['custo'] = $custo;
     $dados['user'] = $this->session->userdata('user_name');
@@ -167,7 +167,7 @@ class Financeiro extends CI_Controller
 
     $custo = $this->model->intervalo('custos', date('Y-m'));
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Custos Mensal';
     $dados['custo'] = $custo;
     $dados['user'] = $this->session->userdata('user_name');
@@ -198,7 +198,7 @@ class Financeiro extends CI_Controller
       $num = $y;
     }
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Balanço Mensal';
     $dados['quant'] = $num;
     $dados['custo'] = $custo;
@@ -211,7 +211,7 @@ class Financeiro extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Quadro de Funcionários do setor de finanças';
     $dados['func'] = $this->model->select('funcionarios');
     $dados['user'] = $this->session->userdata('user_name');

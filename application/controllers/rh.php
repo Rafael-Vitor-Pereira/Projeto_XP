@@ -18,7 +18,7 @@ class Rh extends CI_Controller
 
     $func = $this->model->count('funcionarios');
     $dados['func'] = $func->num;
-    $dados['titulo'] = 'Nome da Empresa';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $dados['tarefas'] = $this->model->get_tarefa($this->session->userdata('user_id'));
     $dados['h2'] = 'Setor de RH';
@@ -44,7 +44,7 @@ class Rh extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Funcinarios de RH';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('rh/cadastro', $dados);
@@ -90,7 +90,7 @@ class Rh extends CI_Controller
   {
     verifica_login();
 
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Quadro de Funcionários';
     $dados['func'] = $this->model->select('funcionarios');
     $dados['user'] = $this->session->userdata('user_name');
@@ -109,7 +109,7 @@ class Rh extends CI_Controller
   public function editar($id)
   {
     $dados['func'] = $this->model->dados('funcionarios', $id);
-    $dados['titulo'] = 'Nome do site';
+    $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('rh/editar', $dados);
   }
