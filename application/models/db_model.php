@@ -202,7 +202,7 @@ class Db_model extends CI_Model
 
   public function update($table, $dados)
   {
-    $this->db->where('id', $dados['id']);
+    $this->db->where('id = ' . $dados['id']);
     unset($dados['id']);
     $this->db->update($table, $dados);
     return $this->db->affected_rows();

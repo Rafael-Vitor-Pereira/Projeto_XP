@@ -1,5 +1,5 @@
 <footer class="main-footer">
-  <strong>&copy; <?php date('Y'); ?> RVTech, todos os direitos reservados</strong>
+  <strong>&copy; <?php date('Y'); ?> XP Soluções Empresariais, todos os direitos reservados</strong>
   <div class="float-right d-none d-sm-inline-block">
     <b>Versão</b> 1.1.5
   </div>

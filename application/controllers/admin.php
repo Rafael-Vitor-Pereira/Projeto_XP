@@ -53,21 +53,24 @@ class Admin extends CI_Controller
     }
     $lucro = $somaCapital - $somaCusto;
     $testa = $this->model->select('caixa');
-    $dia = date('d');
+    $dia = 31;
     if ($dia == 31) {
-      if ($testa != 0) {
+      if ($testa == 0) {
         $caixa['valor'] = $lucro;
         $caixa['mes'] = date('M');
         $this->model->insert($caixa, 'caixa');
+        $somaCaixa = $caixa['valor'];
       } else {
-        $testa->valor = $lucro;
-        $this->model->update('caixa', $testa);
-      }
-    }
-    $somaCaixa = 0;
-    if ($testa != 0) {
-      foreach ($testa as $linha) {
-        $somaCaixa = $somaCaixa + floatval($linha->valor);
+        $somaCaixa = 0;
+        foreach ($testa as $linha) {
+          if ($linha->mes == date('M')) {
+            $dados_update['valor'] = $lucro;
+            $dados_update['id'] = $linha->id;
+            $this->model->update('caixa', $dados_update);
+            $linha->valor = $lucro;
+          }
+          $somaCaixa = $somaCaixa + floatval($linha->valor);
+        }
       }
     }
     $func = $this->model->count('funcionarios');

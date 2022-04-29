@@ -52,7 +52,35 @@
                     </div>
                     <div class="form-group col-3">
                       <label for="setor">Setor:</label>
-                      <input type="text" name="setor" class="form-control" id="setor" placeholder="Setor" value="<?= $func->setor ?>">
+                      <select name="setor" id="setor" class="form-control">
+                        <?php
+                        if ($func->setor == 'Administrativo') {
+                          $adm = 'selected';
+                          $rh = '';
+                          $est = '';
+                          $fin = '';
+                        } else if ($func->setor == 'RH') {
+                          $adm = '';
+                          $rh = 'selected';
+                          $est = '';
+                          $fin = '';
+                        } else if ($func->setor == 'Estoque') {
+                          $adm = '';
+                          $rh = '';
+                          $est = 'selected';
+                          $fin = '';
+                        } else if ($func->setor == 'Financeiro') {
+                          $adm = '';
+                          $rh = '';
+                          $est = '';
+                          $fin = 'selected';
+                        }
+                        ?>
+                        <option value="Administrativo" <?= $adm ?>>Administrativo</option>
+                        <option value="RH" <?= $rh ?>>Recursos Humanos</option>
+                        <option value="Estoque" <?= $est ?>>Estoque</option>
+                        <option value="Financeiro" <?= $fin ?>>Financeiro</option>
+                      </select>
                     </div>
                   </div>
                 </div>
