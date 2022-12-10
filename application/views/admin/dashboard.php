@@ -7,7 +7,7 @@
   <!-- Theme style -->
   <?php
   $this->load->view('header');
-  $this->load->view('admin/menu');
+  $this->load->view('menu');
   ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -36,7 +36,7 @@
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3><?= $vendas ?></h3>
+                <h3><?= $vendas->num ?></h3>
                 <p>Vendas diária</p>
               </div>
               <div class="icon">
@@ -64,7 +64,7 @@
             <!-- small box -->
             <div class="small-box bg-warning">
               <div class="inner">
-                <h3><?= $func ?></h3>
+                <h3><?= $func->num ?></h3>
                 <p>Funcionários</p>
               </div>
               <div class="icon">
@@ -78,13 +78,13 @@
             <!-- small box -->
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3>R$ <?= number_format($valor_diario, 2, ',', '.'); ?></h3>
+                <h3>R$ <?= number_format($valor_diario->valor, 2, ',', '.'); ?></h3>
                 <p>Custos Diários</p>
               </div>
               <div class="icon">
                 <i class="ion ion-pie-graph"></i>
               </div>
-              <a href="<?= base_url('admin/custos'); ?>" class="small-box-footer">Mais informações <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="<?= base_url('custo/listar'); ?>" class="small-box-footer">Mais informações <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
@@ -94,7 +94,7 @@
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3><?= $vendas_mensal ?></h3>
+                <h3><?= $vendas_mensal->num ?></h3>
                 <p>Vendas mensal</p>
               </div>
               <div class="icon">
@@ -107,7 +107,7 @@
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3><?= $prod ?></h3>
+                <h3><?= $prod->num ?></h3>
                 <p>Produtos em Estoque</p>
               </div>
               <div class="icon">
@@ -120,7 +120,7 @@
             <!-- small box -->
             <div class="small-box bg-warning">
               <div class="inner">
-                <h3>R$ <?= number_format($caixa, 2, ',', '.'); ?></h3>
+                <h3>R$ <?= number_format($caixa->valor, 2, ',', '.'); ?></h3>
                 <p>Caixa da empresa</p>
               </div>
               <div class="icon">
@@ -133,13 +133,13 @@
             <!-- small box -->
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3>R$ <?= number_format($valor_mensal, 2, ',', '.'); ?></h3>
+                <h3>R$ <?= number_format($valor_mensal->valor, 2, ',', '.'); ?></h3>
                 <p>Custos Mensais</p>
               </div>
               <div class="icon">
                 <i class="ion ion-bag"></i>
               </div>
-              <a href="<?= base_url('admin/custos_mensal'); ?>" class="small-box-footer">Mais informações <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="<?= base_url('custo/listarMensal'); ?>" class="small-box-footer">Mais informações <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
         </div>

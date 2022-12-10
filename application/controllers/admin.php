@@ -7,7 +7,14 @@ class Admin extends CI_Controller
   function __construct()
   {
     parent::__construct();
-    $this->load->model('db_model', 'model');
+    $this->load->model('vendas_model', 'BDvendas');
+		$this->load->model('custo_model', 'BDcusto');
+		$this->load->model('entrada_model', 'BDentradas');
+		$this->load->model('caixa_model', 'BDcaixa');
+		$this->load->model('funcionario_model', 'BDfuncionario');
+		$this->load->model('produto_model', 'BDproduto');
+		$this->load->model('usuario_model', 'BDusuario');
+		$this->load->model('tarefa_model', 'BDtarefa');
     date_default_timezone_set('america/sao_paulo');
     date_default_timezone_get();
   }
@@ -16,78 +23,32 @@ class Admin extends CI_Controller
   {
     verifica_login();
 
-    $vendas = $this->model->count_vendas(date('Y-m-d'));
-    $vendas_mensais = $this->model->intervalo('vendas', date('Y-m'));
-    $valor_diario = $this->model->select('custos', date('Y-m-d'));
-    $valor_mensal = $this->model->intervalo('custos', date('Y-m'));
-    $capital = $this->model->intervalo('entradas', date('Y-m'));
-    $somaCapital = 0;
-    if ($capital != 0) {
-      foreach ($capital as $linha) {
-        $somaCapital = $somaCapital + floatval($linha->valor);
-      }
-    }
-    $somaCusto = 0;
-    if ($valor_mensal != 0) {
-      foreach ($valor_mensal as $linha) {
-        $somaCusto = $somaCusto + $linha->valor;
-      }
-    }
-    $somaValor = 0;
-    if ($valor_diario != 0) {
-      foreach ($valor_diario as $linha) {
-        $somaValor = $somaValor + floatval($linha->valor);
-      }
-    }
-    $somaValorMensal = 0;
-    if ($valor_mensal != 0) {
-      foreach ($valor_mensal as $linha) {
-        $somaValorMensal = $somaValorMensal + floatval($linha->valor);
-      }
-    }
-    $x = 0;
-    if ($vendas_mensais != 0) {
-      foreach ($vendas_mensais as $linha) {
-        $x++;
-      }
-    }
-    $lucro = $somaCapital - $somaCusto;
-    $testa = $this->model->select('caixa');
-    $dia = 31;
-    if ($dia == 31) {
-      if ($testa == 0) {
-        $caixa['valor'] = $lucro;
-        $caixa['mes'] = date('M');
-        $this->model->insert($caixa, 'caixa');
-        $somaCaixa = $caixa['valor'];
-      } else {
-        $somaCaixa = 0;
-        foreach ($testa as $linha) {
-          if ($linha->mes == date('M')) {
-            $dados_update['valor'] = $lucro;
-            $dados_update['id'] = $linha->id;
-            $this->model->update('caixa', $dados_update);
-            $linha->valor = $lucro;
-          }
-          $somaCaixa = $somaCaixa + floatval($linha->valor);
-        }
-      }
-    }
-    $func = $this->model->count('funcionarios');
-    $prod = $this->model->count('produtos');
-    $dados['vendas'] = $vendas->num;
-    $dados['vendas_mensal'] = $x;
-    $dados['prod'] = $prod->num;
-    $dados['lucro'] = $lucro;
-    $dados['caixa'] = $somaCaixa;
+    $somaCapital = $this->BDentradas->countValores(date('Y-m'));
+    $somaCusto = $this->BDcusto->countValores(date('Y-m'));
+
+		$info['lucro'] = $somaCapital->valor - $somaCusto->valor;
+    $info['teste'] = $this->BDcaixa->select(date('M'));
+		
+		$retorno = fecha_caixa($info);
+
+		if($retorno['retorno']){
+			$this->BDcaixa->insert($retorno['dados']);
+		}
+
+    $dados['vendas'] = $this->BDvendas->count(date('Y-m-d'));
+    $dados['vendas_mensal'] = $this->BDvendas->countMensal(date('Y-m'));
+    $dados['prod'] = $this->BDproduto->count();
+    $dados['lucro'] = $info['lucro'];
+    $dados['caixa'] = $this->BDcaixa->sum();
     $dados['custo'] = $somaCusto;
-    $dados['valor_diario'] = $somaValor;
-    $dados['valor_mensal'] = $somaValorMensal;
-    $dados['func'] = $func->num;
+    $dados['valor_diario'] = $this->BDcusto->countDiario(date('Y-m-d'));
+    $dados['valor_mensal'] = $somaCusto;
+    $dados['func'] = $this->BDfuncionario->count();
     $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
-    $dados['tarefas'] = $this->model->get_tarefa($this->session->userdata('user_id'));
+    $dados['tarefas'] = $this->BDtarefa->select($this->session->userdata('user_id'));
     $dados['h2'] = 'Setor Administrativo';
+
     $this->load->view('admin/dashboard', $dados);
   }
 
@@ -113,7 +74,7 @@ class Admin extends CI_Controller
           'data' => $this->input->post('data'),
         );
 
-        $this->model->insert($dados, 'tarefas');
+        $this->BDtarefa->insert($dados);
 
         $retorno["msg"] = "Cadastro efetuado com sucesso!";
 
@@ -128,15 +89,6 @@ class Admin extends CI_Controller
     }
   }
 
-  public function cadastro()
-  {
-    verifica_login();
-
-    $dados['titulo'] = 'All tech';
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/cadastrar', $dados);
-  }
-
   public function cad_prod()
   {
     verifica_login();
@@ -144,113 +96,6 @@ class Admin extends CI_Controller
     $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('admin/cad_prod', $dados);
-  }
-
-  public function cad_func()
-  {
-    $dados['titulo'] = 'All tech';
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/cad_func', $dados);
-  }
-
-  public function cad_custo()
-  {
-    $dados['titulo'] = 'All tech';
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/cad_custo', $dados);
-  }
-
-  public function gravar()
-  {
-    verifica_login();
-
-    $regras = array(
-      array('field' => 'nome', 'label' => 'Nome', 'rules' => 'trim|required|max_length[80]'),
-      array('field' => 'sobrenome', 'label' => 'Sobrenome', 'rules' => 'trim|required|max_length[80]'),
-      array('field' => 'telefone', 'label' => 'Telefone', 'rules' => 'trim|required'),
-      array('field' => 'cpf', 'label' => 'CPF', 'rules' => 'trim|required'),
-      array('field' => 'pass', 'label' => 'Senha', 'rules' => 'trim|required|min_length[6]'),
-      array('field' => 'user', 'label' => 'Usuario', 'rules' => 'trim|required|min_length[3]'),
-      array('field' => 'email', 'label' => 'E-mail', 'rules' => 'trim|valid_email|required|max_length[255]'),
-      array('field' => 'setor', 'label' => 'Setor', 'rules' => 'trim|required')
-    );
-    $this->form_validation->set_rules($regras);
-
-    if ($this->form_validation->run() == FALSE) {
-      $this->load->view('error');
-    } else {
-      //se não existir usuário com esse e-mail, grava
-      if (!$this->model->TestaEmail($this->input->post('email'), 'usuario')) {
-        //cria usuario com informações repassadas
-        //cria vetor para encaminhar informações
-        $dados = array(
-          'nome' => mb_strtoupper($this->input->post('nome'), 'UTF-8') . ' ' . mb_strtoupper($this->input->post('sobrenome'), 'UTF-8'),
-          'telefone' => $this->input->post('telefone'),
-          'cpf' => $this->input->post('cpf'),
-          'email'   => $this->input->post('email'),
-          'senha' => password_hash($this->input->post('pass'), PASSWORD_DEFAULT),
-          'login' => $this->input->post('user'),
-          'acesso' => $this->input->post('setor')
-        );
-        $this->model->insert($dados, 'usuario');
-
-        $retorno["msg"] = "Cadastro efetuado com sucesso!";
-
-        $this->load->view('success', $retorno);
-      } else {
-        echo '<div class="alert alert-warning alert-dismissible">';
-        echo '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>';
-        echo '<h4><i class="icon fa fa-warning"></i> Aten&ccedil;&atilde;o!</h4>';
-        echo "Já existe um usuário com o e-mail informado.";
-        echo '</div>';
-      }
-    }
-  }
-
-  public function grava_func()
-  {
-    verifica_login();
-
-    $regras = array(
-      array('field' => 'nome', 'label' => 'Nome', 'rules' => 'trim|required|max_length[80]'),
-      array('field' => 'sobrenome', 'label' => 'Sobrenome', 'rules' => 'trim|required|max_length[80]'),
-      array('field' => 'telefone', 'label' => 'Telefone', 'rules' => 'trim|required'),
-      array('field' => 'cpf', 'label' => 'CPF', 'rules' => 'trim|required'),
-      array('field' => 'endereco', 'label' => 'Endereço', 'rules' => 'trim|required|min_length[10]'),
-      array('field' => 'setor', 'label' => 'Setor', 'rules' => 'trim|required|min_length[2]'),
-      array('field' => 'email', 'label' => 'E-mail', 'rules' => 'trim|valid_email|required|max_length[255]')
-    );
-    $this->form_validation->set_rules($regras);
-
-    if ($this->form_validation->run() == FALSE) {
-      $this->load->view('error');
-    } else {
-      //se não existir usuário com esse e-mail, grava
-      if (!$this->model->TestaEmail($this->input->post('email'), 'funcionarios')) {
-        //cria usuario com informações repassadas
-        //cria vetor para encaminhar informações
-        $dados = array(
-          'nome' => mb_strtoupper($this->input->post('nome'), 'UTF-8'),
-          'sobrenome' => mb_strtoupper($this->input->post('sobrenome'), 'UTF-8'),
-          'telefone' => $this->input->post('telefone'),
-          'cpf' => $this->input->post('cpf'),
-          'email'   => $this->input->post('email'),
-          'endereco' => $this->input->post('endereco'),
-          'setor' => $this->input->post('setor')
-        );
-        $this->model->insert($dados, 'funcionarios');
-
-        $retorno["msg"] = "Cadastro efetuado com sucesso!";
-
-        $this->load->view('success', $retorno);
-      } else {
-        echo '<div class="alert alert-warning alert-dismissible">';
-        echo '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>';
-        echo '<h4><i class="icon fa fa-warning"></i> Aten&ccedil;&atilde;o!</h4>';
-        echo "Já existe um usuário com o e-mail informado.";
-        echo '</div>';
-      }
-    }
   }
 
   public function grava_prod()
@@ -273,35 +118,9 @@ class Admin extends CI_Controller
         'estoque' => intval($this->input->post('estoque')),
         'preco' => floatval($this->input->post('preco')),
       );
-      $this->model->insert($dados, 'produtos');
+      $this->BDproduto->insert($dados);
 
       $retorno["msg"] = "Cadastro efetuado com sucesso!";
-
-      $this->load->view('success', $retorno);
-    }
-  }
-
-  public function grava_custo()
-  {
-    verifica_login();
-
-    $regras = array(
-      array('field' => 'cod', 'label' => 'Tipo custo', 'rules' => 'trim|required'),
-      array('field' => 'valor', 'label' => 'Valor', 'rules' => 'trim|required')
-    );
-    $this->form_validation->set_rules($regras);
-
-    if ($this->form_validation->run() == FALSE) {
-      $this->load->view('error');
-    } else {
-      //cria vetor para encaminhar informações
-      $dados = array(
-        'cod' => $this->input->post('cod'),
-        'valor' => floatval($this->input->post('valor'))
-      );
-      $this->model->insert($dados, 'custos');
-
-      $retorno["msg"] = "Informação gravada com sucesso!";
 
       $this->load->view('success', $retorno);
     }
@@ -311,7 +130,7 @@ class Admin extends CI_Controller
   {
     verifica_login();
 
-    $prod = $this->model->dados('produtos', $this->input->post('produto'));
+    $prod = $this->BDproduto->dados($this->input->post('produto'));
 
     $regras = array(
       array('field' => 'produto', 'label' => 'Produto', 'rules' => 'trim|required'),
@@ -337,9 +156,9 @@ class Admin extends CI_Controller
           'cod' => 2,
           'valor' => floatval($prod->preco * $this->input->post('quantidade'))
         );
-        $this->model->insert($dados, 'vendas');
-        $this->model->insert($entrada, 'entradas');
-        $this->model->update('produtos', $atualiza);
+        $this->BDvendas->insert($dados);
+        $this->BDentradas->insert($entrada);
+        $this->BDproduto->update($atualiza);
 
         $retorno["msg"] = "Cadastro efetuado com sucesso!";
 
@@ -358,7 +177,7 @@ class Admin extends CI_Controller
   {
     $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Cadastro de venda de produtos';
-    $dados['prod'] = $this->model->select('produtos');
+    $dados['prod'] = $this->BDproduto->select();
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('admin/vender', $dados);
   }
@@ -367,11 +186,11 @@ class Admin extends CI_Controller
   {
     verifica_login();
 
-    $vendas = $this->model->select('vendas', date('Y-m-d'));
+    $vendas = $this->BDvendas->select(date('Y-m-d'));
     if ($vendas != 0) {
       $x = 0;
       foreach ($vendas as $linha) {
-        $produtos = $this->model->getprod($linha->id_prod);
+        $produtos = $this->BDproduto->selectPorId($linha->id_prod);
         $lista = array(
           'produto' => $produtos->produto,
           'valor_unit' => floatval($produtos->preco),
@@ -396,7 +215,7 @@ class Admin extends CI_Controller
 
   public function editar($id)
   {
-    $dados['func'] = $this->model->dados('funcionarios', $id);
+    $dados['func'] = $this->BDfuncionario->dados($id);
     $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('admin/editar', $dados);
@@ -406,7 +225,7 @@ class Admin extends CI_Controller
   {
     verifica_login();
 
-    $dados['func'] = $this->model->dados('funcionarios', $this->input->post('id'));
+    $dados['func'] = $this->BDfuncionario->dados($this->input->post('id'));
     //VERIFICAR REGRAS QUE SERAO UTILIZADAS
     $regras = array(
       array('field' => 'nome', 'label' => 'Nome', 'rules' => 'trim|required|min_length[3]|max_length[80]'),
@@ -431,7 +250,7 @@ class Admin extends CI_Controller
         'setor' => $this->input->post('setor'),
         'id' => $this->input->post('id')
       );
-      $this->model->update('funcionarios', $dados);
+      $this->BDfuncionario->update($dados);
 
       $retorno["msg"] = "Cadastro alterado com sucesso!";
 
@@ -443,11 +262,11 @@ class Admin extends CI_Controller
   {
     verifica_login();
 
-    $vendas = $this->model->intervalo('vendas', date('Y-m'));
+    $vendas = $this->BDvendas->intervalo(date('Y-m'));
     if ($vendas != 0) {
       $x = 0;
       foreach ($vendas as $linha) {
-        $produtos = $this->model->getprod($linha->id_prod);
+        $produtos = $this->BDproduto->selectPorId($linha->id_prod);
         $lista = array(
           'produto' => $produtos->produto,
           'valor_unit' => floatval($produtos->preco),
@@ -476,11 +295,11 @@ class Admin extends CI_Controller
 
     if ($dados_form = $this->input->post()) {
       $data = $dados_form['ano'] . '-' . $dados_form['mes'];
-      $custo = $this->model->intervalo('custos', $data);
-      $capital = $this->model->intervalo('entradas', $data);
+      $custo = $this->BDcusto->intervalo($data);
+      $capital = $this->BDentradas->intervalo($data);
     } else {
-      $custo = $this->model->intervalo('custos', date('Y-m'));
-      $capital = $this->model->intervalo('entradas', date('Y-m'));
+      $custo = $this->BDcusto->intervalo(date('Y-m'));
+      $capital = $this->BDentradas->intervalo(date('Y-m'));
     }
     $x = 0;
     if ($custo != 0) {
@@ -508,69 +327,13 @@ class Admin extends CI_Controller
     $this->load->view('admin/balanco', $dados);
   }
 
-  public function funcionarios()
-  {
-    verifica_login();
-
-    $dados['titulo'] = 'All tech';
-    $dados['h2'] = 'Quadro de Funcionários';
-    $dados['func'] = $this->model->select('funcionarios');
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/funcionarios', $dados);
-  }
-
-  public function custos()
-  {
-    verifica_login();
-
-    $custo = $this->model->select('custos', date('Y-m-d'));
-
-    $dados['titulo'] = 'All tech';
-    $dados['h2'] = 'Custos Diários';
-    $dados['custo'] = $custo;
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/custos', $dados);
-  }
-
-  public function custos_mensal()
-  {
-    verifica_login();
-
-    if ($dados_form = $this->input->post()) {
-      $data = $dados_form['ano'] . '-' . $dados_form['mes'];
-      $custo = $this->model->intervalo('custos', $data);
-    } else {
-      $custo = $this->model->intervalo('custos', date('Y-m'));
-    }
-
-    $dados['titulo'] = 'All tech';
-    $dados['h2'] = 'Custos Mensais';
-    $dados['custo'] = $custo;
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/custos', $dados);
-  }
-
   public function produtos()
   {
     $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Lista de Produtos em estoque';
-    $dados['prod'] = $this->model->select('produtos');
+    $dados['prod'] = $this->BDproduto->select();
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('admin/produtos', $dados);
-  }
-
-  public function bloquear()
-  {
-    verifica_login();
-
-    $num = $this->model->count('usuario');
-    $dados['usuario'] = $this->model->select('usuario');
-    $dados['titulo'] = 'All tech';
-    $dados['h2'] = 'Lista de Bloqueio';
-    $dados['id'] = $this->session->userdata('user_id');
-    $dados['num'] = intval($num->num);
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/bloquear', $dados);
   }
 
   public function gravar_status()
@@ -578,26 +341,17 @@ class Admin extends CI_Controller
     verifica_login();
 
     $id = $this->input->post('id');
-    $status = $this->model->TransacaoStatus($id);
-    if ($status->status == 1) {
+    $status = $this->BDusuario->TransacaoStatus($id);
+    if ($status->status) {
       $dados['status'] = 0;
       $dados['id'] = $id;
-      $this->model->update('usuario', $dados);
+      $this->BDusuario->update($dados);
       echo "<i class='fa fa-toggle-off'></i> Inativo";
     } else {
       $dados['status'] = 1;
       $dados['id'] = $id;
-      $this->model->update('usuario', $dados);
+      $this->BDusuario->update($dados);
       echo "<i class='fa fa-toggle-on'></i> Ativo";
     }
-  }
-
-  public function excluir()
-  {
-    verifica_login();
-
-    $id = $this->input->post('id');
-
-    $this->model->delete($id);
   }
 }

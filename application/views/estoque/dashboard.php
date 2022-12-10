@@ -7,7 +7,7 @@
   <!-- Theme style -->
   <?php
   $this->load->view('header');
-  $this->load->view('estoque/menu');
+  $this->load->view('menu');
   ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">

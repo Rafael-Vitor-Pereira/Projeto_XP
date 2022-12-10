@@ -21,6 +21,11 @@ a:hover {
 	padding: 5px 0;
 }
 
+.table-title{
+	text-align: center;
+	padding-bottom: 40%;
+}
+
 /* estilos reutilizaveis */
 
 h1,

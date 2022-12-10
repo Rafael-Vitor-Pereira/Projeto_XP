@@ -34,7 +34,6 @@ if (!function_exists('verifica_login')) {
 }
 
 if (!function_exists('config_upload')) {
-	//verifica se o usuário está logado, caso negativo redireciona para outra pagina
 	function config_upload($path = './uploads', $types = 'jpg|png', $size = 512)
 	{
 		$config['upload_path'] = $path;
@@ -61,12 +60,71 @@ if (!function_exists('to_html')) {
 }
 
 if (!function_exists('resumo_msg')) {
-	//gera um texto parcial a partir do conteudo de um post
+	//gera um texto parcial a partir do conteudo de uma mensagem
 	function resumo_msg($string = NULL, $tamanho = 40)
 	{
 		$string = to_html($string);
 		$string = strip_tags($string);
 		$string = substr($string, 0, $tamanho);
 		return $string;
+	}
+}
+
+if (!function_exists('soma_valores')) {
+	function soma_valores($dados)
+	{
+		$soma = 0;
+		if(($dados != 0) && (!is_null($dados))){
+			foreach ($dados as $linha) {
+				$soma = $soma + floatval($linha->valor);
+			}
+		}
+
+		return $soma;
+	}
+}
+
+if (!function_exists('fecha_caixa')) {
+	function fecha_caixa($dados)
+	{
+		$mes = date('m');
+		if($mes == 2){
+			$num = 28;
+		}elseif(($mes == 4) || ($mes == 6) || ($mes == 9) || ($mes == 11)){
+			$num = 30;
+		}else{
+			$num = 31;
+		}
+
+		$dia = date('d');
+    	if (($dia == $num) && ($dados['teste'] == 0)) {
+       		$caixa['valor'] = $dados['lucro'];
+       		$caixa['mes'] = date('M');
+			$dados_retorno['dados'] = $caixa;      		
+			$dados_retorno['retorno'] = true;
+			return $dados_retorno;
+    	}else{
+			$dados_retorno['retorno'] = false;
+			return $dados_retorno;
+		}
+	}
+}
+
+if (!function_exists('logar')) {
+	function logar($dados)
+	{
+		$ci = &get_instance();
+
+		$ci->session->set_userdata('logged', TRUE);
+		$ci->session->set_userdata('user_login', $dados['login']['login']);
+		$ci->session->set_userdata('user_name', $dados['dados']->nome);
+		$ci->session->set_userdata('user_id', $dados['dados']->id);
+		$ci->session->set_userdata('user_acess', $dados['dados']->acesso);
+
+		if ($dados['login']['remember'] == 'on' && empty($_COOKIE['login'])) {
+			$cad = serialize($ci->session->userdata());
+
+			setcookie("login", $cad, time() + 604800);
+		}
 	}
 }

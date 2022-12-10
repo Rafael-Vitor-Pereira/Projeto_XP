@@ -7,7 +7,9 @@ class Financeiro extends CI_Controller
   function __construct()
   {
     parent::__construct();
-    $this->load->model('db_model', 'model');
+    $this->load->model('vendas_model', 'BDvendas');
+		$this->load->model('custo_model', 'BDcusto');
+		$this->load->model('entrada_model', 'BDentrada');
     date_default_timezone_set('america/sao_paulo');
     date_default_timezone_get();
   }
@@ -16,31 +18,14 @@ class Financeiro extends CI_Controller
   {
     verifica_login();
 
-    $vendas = $this->model->count_vendas(date('Y-m-d'));
-    $custo = $this->model->select('custos');
-    $valor = $this->model->select('custos', date('Y-m-d'));
-    $capital = $this->model->select('entradas');
-    $x = 0;
-    $somaCapital = 0;
-    if ($capital != 0) {
-      foreach ($capital as $linha) {
-        $somaCapital = $somaCapital + floatval($linha->valor);
-      }
-    }
-    $somaCusto = 0;
-    if ($custo != 0) {
-      foreach ($custo as $linha) {
-        $somaCusto = $somaCusto + $linha->valor;
-      }
-    }
-    $somaValor = 0;
-    if ($valor != 0) {
-      foreach ($valor as $linha) {
-        $somaValor = $somaValor + $linha->valor;
-      }
-    }
+    $vendas = $this->BDvendas->count(date('Y-m-d'));
+    
+    $somaCapital = soma_valores($this->BDentrada->select());
+    $somaCusto = soma_valores($this->BDcusto->select());
+    $somaValor = soma_valores($this->BDcusto->select(date('Y-m-d')));
+
     $lucro = $somaCapital - $somaCusto;
-    $func = $this->model->count('funcionarios', 'setor', 'Financeiro');
+    $func = $this->BDfuncionario->count('setor', 'Financeiro');
     $dados['vendas'] = $vendas->num;
     $dados['lucro'] = $lucro;
     $dados['custo'] = $somaCusto;
@@ -48,7 +33,7 @@ class Financeiro extends CI_Controller
     $dados['func'] = $func->num;
     $dados['titulo'] = 'All tech';
     $dados['user'] = $this->session->userdata('user_name');
-    $dados['tarefas'] = $this->model->get_tarefa($this->session->userdata('user_id'));
+    $dados['tarefas'] = $this->BDtarefa->select($this->session->userdata('user_id'));
     $dados['h2'] = "Setor Financeiro";
     $this->load->view('financas/dashboard', $dados);
   }
@@ -63,7 +48,7 @@ class Financeiro extends CI_Controller
     $dados['id_usuario'] = $this->session->userdata('user_id');
     $dados['data'] = $dados_input['data'];
 
-    $this->model->insert($dados, 'tarefas');
+    $this->BDtarefa->insert($dados);
 
     redirect('financeiro/dashboard');
   }
@@ -104,12 +89,12 @@ class Financeiro extends CI_Controller
       $this->load->view('error');
     } else {
       //se não existir usuário com esse e-mail, grava
-      if (!$this->model->TestaEmail($this->input->post('email'), 'funcionarios')) {
+      if (!$this->BDfuncionario->TestaEmail($this->input->post('email'))) {
         //cria usuario com informações repassadas
         //cria vetor para encaminhar informações
         $dados = array('nome' => mb_strtoupper($this->input->post('nome'), 'UTF-8'), 'sobrenome' => mb_strtoupper($this->input->post('sobrenome'), 'UTF-8'), 'telefone' => $this->input->post('telefone'), 'cpf' => $this->input->post('cpf'), 'email' => $this->input->post('email'), 'setor' => $this->input->post('setor'), 'endereco' => $this->input->post('endereco'));
 
-        $this->model->insert($dados, 'funcionarios');
+        $this->BDfuncionario->insert($dados);
         $retorno["msg"] = "Cadastro efetuado com sucesso!";
 
         $this->load->view('success', $retorno);
@@ -140,7 +125,7 @@ class Financeiro extends CI_Controller
         'cod' => intval($this->input->post('cod')),
         'valor' => floatval($this->input->post('valor'))
       );
-      $this->model->insert($dados, 'custos');
+      $this->BDcusto->insert($dados);
 
       $retorno["msg"] = "Cadastro efetuado com sucesso!";
 
@@ -152,11 +137,9 @@ class Financeiro extends CI_Controller
   {
     verifica_login();
 
-    $custo = $this->model->select('custos', date('Y-m-d'));
-
     $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Custos Diários';
-    $dados['custo'] = $custo;
+    $dados['custo'] = $this->BDcusto->select(date('Y-m-d'));
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('financas/custos', $dados);
   }
@@ -165,11 +148,9 @@ class Financeiro extends CI_Controller
   {
     verifica_login();
 
-    $custo = $this->model->intervalo('custos', date('Y-m'));
-
     $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Custos Mensal';
-    $dados['custo'] = $custo;
+    $dados['custo'] = $this->BDcusto->intervalo(date('Y-m'));
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('financas/custos', $dados);
   }
@@ -178,8 +159,8 @@ class Financeiro extends CI_Controller
   {
     verifica_login();
 
-    $custo = $this->model->intervalo('custos', date('Y-m'));
-    $capital = $this->model->intervalo('entradas', date('Y-m'));
+    $custo = $this->BDcusto->intervalo(date('Y-m'));
+    $capital = $this->BDentrada->intervalo(date('Y-m'));
     $x = 0;
     if ($custo != 0) {
       foreach ($custo as $linha) {
@@ -213,7 +194,7 @@ class Financeiro extends CI_Controller
 
     $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Quadro de Funcionários do setor de finanças';
-    $dados['func'] = $this->model->select('funcionarios');
+    $dados['func'] = $this->BDfuncionario->select();
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('financas/funcionarios', $dados);
   }

@@ -7,7 +7,8 @@ class Pagina extends CI_Controller
 	function __construct()
 	{
 		parent::__construct();
-		$this->load->model('db_model', 'model');
+		$this->load->model('usuario_model', 'BDusuario');
+		$this->load->model('mensagem_model', 'BDmensagem');
 		date_default_timezone_set('america/sao_paulo');
 		date_default_timezone_get();
 	}
@@ -25,22 +26,14 @@ class Pagina extends CI_Controller
 			}
 		} else {
 			$dados_form = $this->input->post();
-			if ($result = $this->model->get($dados_form['login'])) {
+			if ($result = $this->BDusuario->login($dados_form['login'])) {
 				if ($result->status == 1) {
 					//usuário existe
 					if (password_verify($dados_form['senha'], $result->senha)) {
 						//senha ok, fazer login
-						$this->session->set_userdata('logged', TRUE);
-						$this->session->set_userdata('user_login', $dados_form['login']);
-						$this->session->set_userdata('user_name', $result->nome);
-						$this->session->set_userdata('user_id', $result->id);
-						$this->session->set_userdata('user_acess', $result->acesso);
-
-						if ($dados_form['remember'] == 'on' && empty($_COOKIE['login'])) {
-							$cad = serialize($this->session->userdata());
-
-							setcookie("login", $cad, time() + 604800);
-						}
+						$dados['dados'] = $result; 
+						$dados['login'] = $dados_form;
+						logar($dados);
 						//fazer redirect para dashboard do sistema
 						if ($this->session->userdata('user_acess') == 'admin') {
 							redirect('admin/index', 'refresh');
@@ -64,14 +57,12 @@ class Pagina extends CI_Controller
 			}
 		}
 		if (!empty($_COOKIE['login'])) {
-			$dados = unserialize($_COOKIE['login']);
-			$result = $this->model->get($dados['user_login']);
+			$cookie = unserialize($_COOKIE['login']);
+			$result = $this->BDusuario->login($cookie['user_login']);
 			if ($result->status == 1) {
-				$this->session->set_userdata('logged', $dados['logged']);
-				$this->session->set_userdata('user_login', $dados['user_login']);
-				$this->session->set_userdata('user_name', $dados['user_name']);
-				$this->session->set_userdata('user_id', $dados['user_id']);
-				$this->session->set_userdata('user_acess', $dados['user_acess']);
+				$dados['dados'] = $result; 
+				$dados['login'] = $cookie;
+				logar($dados);
 				if ($this->session->userdata('user_acess') == 'admin') {
 					redirect('admin/index', 'refresh');
 				} else if ($this->session->userdata('user_acess') == 'chefe de estoque') {
@@ -81,9 +72,6 @@ class Pagina extends CI_Controller
 				} else if ($this->session->userdata('user_acess') == 'chefe de finanças') {
 					redirect('financeiro/index', 'refresh');
 				}
-			} else {
-				set_msg('Usuário não existe ou está bloqueado');
-				setcookie("login", '', time() - 10);
 			}
 		} else {
 			//Carrega view
@@ -97,24 +85,26 @@ class Pagina extends CI_Controller
 	{
 		verifica_login();
 
-		$dados_msg = $this->model->getmsg('mensagens', $this->session->userdata('user_id'), 'listar');
+		$dados_msg = $this->BDmensagem->listar($this->session->userdata('user_id'));
 		if ($dados_msg != 0) {
 			$x = 0;
 			foreach ($dados_msg as $linha) {
-				$dados_remet = $this->model->dados('usuario', $linha->remetente);
-				$dados_dest = $this->model->dados('usuario', $linha->destinatario);
-				$msg[$x] = array(
-					'nome_remet' => $dados_remet->acesso,
-					'email_remet' => $dados_remet->email,
-					'nome_dest' => $dados_dest->nome,
-					'email_dest' => $dados_dest->email,
-					'destinatario' => $linha->destinatario,
-					'titulo' => $linha->titulo,
-					'conteudo' => $linha->conteudo,
-					'data' => $linha->data,
-					'hora' => $linha->hora,
-					'id' => $linha->id
-				);
+				$dados_remet = $this->BDusuario->dados($linha->remetente);
+				$dados_dest = $this->BDusuario->dados($linha->destinatario);
+				if($linha->tipo == 'enviada'){
+					$msg[$x] = array(
+						'nome_remet' => $dados_remet->acesso,
+						'email_remet' => $dados_remet->email,
+						'nome_dest' => $dados_dest->nome,
+						'email_dest' => $dados_dest->email,
+						'destinatario' => $linha->destinatario,
+						'titulo' => $linha->titulo,
+						'conteudo' => $linha->conteudo,
+						'data' => $linha->data,
+						'hora' => $linha->hora,
+						'id' => $linha->id
+					);
+				}
 				$x++;
 			}
 		} else {
@@ -134,12 +124,12 @@ class Pagina extends CI_Controller
 		verifica_login();
 
 		$id = $this->uri->segment(3);
-		$dados_msg = $this->model->getmsg('mensagens', $id, 'ler');
+		$dados_msg = $this->BDmensagem->select($id);
 		if ($dados_msg != 0) {
 			$x = 0;
 			foreach ($dados_msg as $linha) {
-				$dados_remet = $this->model->dados('usuario', $linha->remetente);
-				$dados_dest = $this->model->dados('usuario', $linha->destinatario);
+				$dados_remet = $this->BDusuario->dados($linha->remetente);
+				$dados_dest = $this->BDusuario->dados($linha->destinatario);
 				$msg = array(
 					'nome_remet' => $dados_remet->acesso,
 					'email_remet' => $dados_remet->email,
@@ -172,12 +162,12 @@ class Pagina extends CI_Controller
 		verifica_login();
 
 		$id = $this->uri->segment(2);
-		$dados_msg = $this->model->getmsg('rascunho', $id, 'ler');
+		$dados_msg = $this->BDmensagem->select($id);
 		if ($dados_msg != 0) {
 			$x = 0;
 			foreach ($dados_msg as $linha) {
-				$dados_remet = $this->model->dados('usuario', $linha->remetente);
-				$dados_dest = $this->model->dados('usuario', $linha->destinatario);
+				$dados_remet = $this->BDusuario->dados($linha->remetente);
+				$dados_dest = $this->BDusuario->dados($linha->destinatario);
 				$msg = array(
 					'nome_remet' => $dados_remet->acesso,
 					'email_remet' => $dados_remet->email,
@@ -217,12 +207,12 @@ class Pagina extends CI_Controller
 	{
 		verifica_login();
 
-		$dados_msg = $this->model->getmsg('mensagens', $this->session->userdata('user_id'), 'listar');
+		$dados_msg = $this->BDmensagem->listar($this->session->userdata('user_id'));
 		if ($dados_msg != 0) {
 			$x = 0;
 			foreach ($dados_msg as $linha) {
-				$dados_remet = $this->model->dados('usuario', $linha->remetente);
-				$dados_dest = $this->model->dados('usuario', $linha->destinatario);
+				$dados_remet = $this->BDusuario->dados($linha->remetente);
+				$dados_dest = $this->BDusuario->dados($linha->destinatario);
 				$msg[$x] = array(
 					'nome_remet' => $dados_remet->acesso,
 					'email_remet' => $dados_remet->email,
@@ -256,12 +246,12 @@ class Pagina extends CI_Controller
 	{
 		verifica_login();
 
-		$dados_msg = $this->model->getmsg('mensagens', $this->session->userdata('user_id'), 'listar');
+		$dados_msg = $this->BDmensagem->listar($this->session->userdata('user_id'));
 		if ($dados_msg != 0) {
 			$x = 0;
 			foreach ($dados_msg as $linha) {
-				$dados_remet = $this->model->dados('usuario', $linha->remetente);
-				$dados_dest = $this->model->dados('usuario', $linha->destinatario);
+				$dados_remet = $this->BDusuario->dados($linha->remetente);
+				$dados_dest = $this->BDusuario->dados($linha->destinatario);
 				$msg[$x] = array(
 					'nome_remet' => $dados_remet->acesso,
 					'email_remet' => $dados_remet->email,
@@ -310,9 +300,9 @@ class Pagina extends CI_Controller
 		} else {
 			$dados_form = $this->input->post();
 
-			$id_dest = $this->model->getid('usuario', 'email', $dados_form['dest']);
+			$id_dest = $this->BDusuario->selectId('email', $dados_form['dest']);
 
-			$msg = array(
+			$dados = array(
 				'remetente' => $this->session->userdata('user_id'),
 				'destinatario' => $id_dest->id,
 				'titulo' => $dados_form['titulo'],
@@ -320,13 +310,15 @@ class Pagina extends CI_Controller
 			);
 
 			if (isset($dados_form['rascunho'])) {
-				if ($this->model->insert($msg, 'rascunho')) {
+				$dados['tipo'] = 'rascunho';
+				if ($this->BDmensagem->insert($dados)) {
 					set_msg('<div class="alert alert-success" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><p>Rascunho salvo com sucesso</p></div>');
 				} else {
 					set_msg('<div class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><p>Falha ao salvar rascunho</p></div>');
 				}
 			} else {
-				if ($this->model->insert($msg, 'mensagens')) {
+				$dados['tipo'] = 'enviada';
+				if ($this->BDmensagem->insert($dados)) {
 					set_msg('<div class="alert alert-success" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><p>Mensagem enviada com sucesso</p></div>');
 				} else {
 					set_msg('<div class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><p>Falha ao enviar a mensagem</p></div>');
@@ -346,11 +338,11 @@ class Pagina extends CI_Controller
 	{
 		verifica_login();
 
-		$dados_msg = $this->model->getmsg('rascunho', $this->session->userdata('user_id'), 'listar');
+		$dados_msg = $this->BDmensagem->listar($this->session->userdata('user_id'), 'rascunho');
 		if ($dados_msg != 0) {
 			$x = 0;
 			foreach ($dados_msg as $linha) {
-				$dados_dest = $this->model->dados('usuario', $linha->destinatario);
+				$dados_dest = $this->BDusuario->dados($linha->destinatario);
 				$msg[$x] = array(
 					'remetente' => $linha->remetente,
 					'acesso' => $dados_dest->acesso,
@@ -382,7 +374,7 @@ class Pagina extends CI_Controller
 		$dados['titulo'] = 'All tech';
 		$dados['h2'] = 'Lista de Contatos';
 		$dados['logado'] = $this->session->userdata('user_login');
-		$dados['lista'] = $this->model->select('usuario');
+		$dados['lista'] = $this->BDusuario->select();
 		$dados['user'] = $this->session->userdata('user_name');
 		$this->load->view('contatos', $dados);
 	}
@@ -395,7 +387,7 @@ class Pagina extends CI_Controller
 		$dados['excluido'] = 'sim';
 		$pag = $this->input->post('pag');
 
-		if ($this->model->update('mensagens', $dados)) {
+		if ($this->BDmensagem->update($dados)) {
 			set_msg('<div class="alert alert-success" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><p>Mensagem excluida com sucesso</p></div>');
 
 			redirect($pag, 'refresh');
@@ -408,7 +400,7 @@ class Pagina extends CI_Controller
 	{
 		verifica_login();
 
-		$result = $this->model->dados('usuario', $this->session->userdata('user_id'));
+		$result = $this->BDusuario->dados($this->session->userdata('user_id'));
 		if (isset($result)) {
 			$dados['telefone'] = $result->telefone;
 			$dados['email'] = $result->email;
@@ -425,7 +417,7 @@ class Pagina extends CI_Controller
 	{
 		verifica_login();
 
-		$result = $this->model->dados('usuario', $this->session->userdata('user_id'));
+		$result = $this->BDusuario->dados($this->session->userdata('user_id'));
 		if (isset($result)) {
 			$dados['telefone'] = $result->telefone;
 			$dados['email'] = $result->email;
@@ -463,7 +455,7 @@ class Pagina extends CI_Controller
 		if ($this->form_validation->run() == FALSE) {
 			$this->load->view('error');
 		} else {
-			$result = $this->model->dados('usuario', $this->session->userdata('user_id'));
+			$result = $this->BDusuario->dados($this->session->userdata('user_id'));
 			if ($this->input->post('pass_ant') != '') {
 				if (password_verify($this->input->post('pass_ant'), $result->senha)) {
 					//cria usuario com informações repassadas
@@ -476,7 +468,7 @@ class Pagina extends CI_Controller
 						'login' => $this->input->post('user'),
 						'id' => $this->session->userdata('user_id')
 					);
-					$this->model->update('usuario', $dados);
+					$this->BDusuario->update($dados);
 
 					$retorno["msg"] = "Cadastro alterado com sucesso!";
 
@@ -490,7 +482,7 @@ class Pagina extends CI_Controller
 					'login' => $this->input->post('user'),
 					'id' => $this->session->userdata('user_id')
 				);
-				$this->model->update('usuario', $dados);
+				$this->BDusuario->update($dados);
 
 				$retorno["msg"] = "Cadastro alterado com sucesso!";
 

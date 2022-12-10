@@ -7,7 +7,10 @@ class Estoque extends CI_Controller
   function __construct()
   {
     parent::__construct();
-    $this->load->model('db_model', 'model');
+    $this->load->model('vendas_model', 'BDvendas');
+		$this->load->model('produto_model', 'BDproduto');
+		$this->load->model('funcionario_model', 'BDfuncionario');
+		$this->load->model('tarefa_model', 'BDtarefa');
     date_default_timezone_set('america/sao_paulo');
     date_default_timezone_get();
   }
@@ -16,10 +19,10 @@ class Estoque extends CI_Controller
   {
     verifica_login();
 
-    $vendas = $this->model->count_vendas(date('Y-m-d'));
-    $prod = $this->model->count('produtos');
-    $func = $this->model->count('funcionarios', 'setor', 'Estoque');
-    $vm = $this->model->intervalo('vendas', date('Y-m'));
+    $vendas = $this->BDvendas->count(date('Y-m-d'));
+    $prod = $this->BDproduto->count();
+    $func = $this->BDfuncionario->count('setor', 'Estoque');
+    $vm = $this->BDvendas->intervalo(date('Y-m'));
     $x = 0;
     if ($vm != 0) {
       foreach ($vm as $linha) {
@@ -33,7 +36,7 @@ class Estoque extends CI_Controller
     $dados['titulo'] = 'All tech';
     $dados['id'] = $this->session->userdata('user_id');
     $dados['user'] = $this->session->userdata('user_name');
-    $dados['tarefas'] = $this->model->get_tarefa($this->session->userdata('user_id'));
+    $dados['tarefas'] = $this->BDtarefa->select($this->session->userdata('user_id'));
     $dados['h2'] = 'Controle de Estoque';
     $this->load->view('estoque/dashboard', $dados);
   }
@@ -51,7 +54,7 @@ class Estoque extends CI_Controller
   {
     $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Cadastro de venda de produtos';
-    $dados['prod'] = $this->model->select('produtos');
+    $dados['prod'] = $this->BDproduto->select();
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('estoque/vender', $dados);
   }
@@ -76,7 +79,7 @@ class Estoque extends CI_Controller
         'estoque' => intval($this->input->post('estoque')),
         'preco' => floatval($this->input->post('preco')),
       );
-      $this->model->insert($dados, 'produtos');
+      $this->BDproduto->insert($dados);
 
       $retorno["msg"] = "Cadastro efetuado com sucesso!";
 
@@ -88,7 +91,7 @@ class Estoque extends CI_Controller
   {
     verifica_login();
 
-    $prod = $this->model->dados('produtos', $this->input->post('produto'));
+    $prod = $this->BDproduto->dados($this->input->post('produto'));
 
     $regras = array(
       array('field' => 'produto', 'label' => 'Produto', 'rules' => 'trim|required'),
@@ -110,8 +113,8 @@ class Estoque extends CI_Controller
           'id' => $this->input->post('produto'),
           'estoque' => $prod->estoque - $this->input->post('quantidade')
         );
-        $this->model->insert($dados, 'vendas');
-        $this->model->update('produtos', $atualiza);
+        $this->BDvendas->insert($dados);
+        $this->BDproduto->update($atualiza);
 
         $retorno["msg"] = "Cadastro efetuado com sucesso!";
 
@@ -136,7 +139,7 @@ class Estoque extends CI_Controller
     $dados['id_usuario'] = $this->session->userdata('user_id');
     $dados['data'] = $dados_input['data'];
 
-    $this->model->insert($dados, 'tarefas');
+    $this->BDtarefa->insert($dados);
 
     redirect('estoque/dashboard');
   }
@@ -167,13 +170,18 @@ class Estoque extends CI_Controller
     if ($this->form_validation->run() == FALSE) {
       $this->load->view('error');
     } else {
-      //se não existir usuário com esse e-mail, grava
-      if (!$this->model->TestaEmail($this->input->post('email'), 'funcionarios')) {
-        //cria usuario com informações repassadas
-        //cria vetor para encaminhar informações
-        $dados = array('nome' => mb_strtoupper($this->input->post('nome'), 'UTF-8'), 'sobrenome' => mb_strtoupper($this->input->post('sobrenome'), 'UTF-8'), 'telefone' => $this->input->post('telefone'), 'cpf' => $this->input->post('cpf'), 'email' => $this->input->post('email'), 'setor' => $this->input->post('setor'), 'endereco' => $this->input->post('endereco'));
+      if (!$this->BDfuncionario->TestaEmail($this->input->post('email'))) {
+        $dados = array(
+						'nome' => mb_strtoupper($this->input->post('nome'), 'UTF-8'), 
+						'sobrenome' => mb_strtoupper($this->input->post('sobrenome'), 'UTF-8'), 
+						'telefone' => $this->input->post('telefone'), 
+						'cpf' => $this->input->post('cpf'), 
+						'email' => $this->input->post('email'), 
+						'setor' => $this->input->post('setor'), 
+						'endereco' => $this->input->post('endereco')
+					);
 
-        $this->model->insert($dados, 'funcionarios');
+        $this->BDfuncionario->insert($dados);
         $retorno["msg"] = "Cadastro efetuado com sucesso!";
 
         $this->load->view('success', $retorno);
@@ -191,11 +199,11 @@ class Estoque extends CI_Controller
   {
     verifica_login();
 
-    $vendas = $this->model->select('vendas', date('Y-m-d'));
+    $vendas = $this->BDvendas->select(date('Y-m-d'));
     if ($vendas != 0) {
       $x = 0;
       foreach ($vendas as $linha) {
-        $produtos = $this->model->getprod($linha->id_prod);
+        $produtos = $this->BDproduto->selectPorId($linha->id_prod);
         $lista = array(
           'produto' => $produtos->produto,
           'valor_unit' => floatval($produtos->preco),
@@ -221,11 +229,11 @@ class Estoque extends CI_Controller
   {
     verifica_login();
 
-    $vendas = $this->model->intervalo('vendas', date('Y-m'));
+    $vendas = $this->BDvendas->intervalo(date('Y-m'));
     if ($vendas != 0) {
       $x = 0;
       foreach ($vendas as $linha) {
-        $produtos = $this->model->getprod($linha->id_prod);
+        $produtos = $this->BDproduto->selectPorId($linha->id_prod);
         $lista = array(
           'produto' => $produtos->produto,
           'valor_unit' => floatval($produtos->preco),
@@ -251,7 +259,7 @@ class Estoque extends CI_Controller
   {
     $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Lista de Produtos em estoque';
-    $dados['prod'] = $this->model->select('produtos');
+    $dados['prod'] = $this->BDproduto->select();
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('estoque/produtos', $dados);
   }
@@ -262,7 +270,7 @@ class Estoque extends CI_Controller
 
     $dados['titulo'] = 'All tech';
     $dados['h2'] = 'Quadro de Funcionários do setor de estoque';
-    $dados['func'] = $this->model->select('funcionarios');
+    $dados['func'] = $this->BDfuncionario->select();
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('estoque/funcionarios', $dados);
   }
