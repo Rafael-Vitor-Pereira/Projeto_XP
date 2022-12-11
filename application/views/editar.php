@@ -1,19 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-  <?php
-  $this->load->view('header');
-  if ($access == 'admin') {
-    $this->load->view('admin/menu');
-  } else if ($access == 'chefe de RH') {
-    $this->load->view('rh/menu');
-  } else if ($access == 'chefe de estoque') {
-    $this->load->view('estoque/menu');
-  } else if ($access == 'chefe de finanças') {
-    $this->load->view('financas/menu');
-  }
-  ?>
   <div class="content-wrapper">
     <br><br>
     <!-- Main content -->
@@ -98,20 +82,8 @@
   </div>
   <!-- /.content-wrapper -->
 
-  <?php $this->load->view('footer') ?>
-  <!-- jquery-validation -->
-  <script src="<?php echo base_url("assets/"); ?>plugins/jquery-validation/jquery.validate.min.js"></script>
-  <script src="<?php echo base_url("assets/"); ?>plugins/jquery-validation/additional-methods.min.js"></script>
   <!-- Page specific script -->
   <script>
-    function mascara_tel(tel) {
-      if (tel.value.length == 0)
-        tel.value = '(' + tel.value;
-      if (tel.value.length == 3) tel.value = tel.value + ') ';
-      if (tel.value.length == 6) tel.value = tel.value + ' ';
-      if (tel.value.length == 11) tel.value = tel.value + '-';
-    }
-
     var form = $('#ajaxform');
     //definindo regras de validação de formulário
     $('#ajaxform').validate({

@@ -30,9 +30,32 @@ class Vendas_model extends CI_Model
     if ($result->num_rows() > 0) {
       return $result->result();
     } else {
-      return 0;
+      return null;
     }
   }
+
+	public function dados($id)
+  {
+    $this->db
+      ->select('*')
+      ->from('vendas')
+    	->where('id_venda', $id);
+
+    $result = $this->db->get();
+
+    if ($result->num_rows() > 0) {
+      return $result->row();
+    } else {
+      return null;
+    }
+  }
+
+	public function update($dados){
+		$this->db->where('id_venda', $dados['id']);
+		unset($dados['id']);
+		$this->db->update('vendas', $dados);
+		return $this->db->affected_rows();
+	}
 
 	public function count($data)
   {
@@ -80,4 +103,11 @@ class Vendas_model extends CI_Model
       return 0;
     }
   }
+
+	public function delete($id){
+		$result = $this->db->where('id_venda', (int)$id)
+      ->delete('vendas');
+
+    return $result;
+	}
 }

@@ -116,7 +116,11 @@ class Pagina extends CI_Controller
 		$dados['user'] = $this->session->userdata('user_name');
 		$dados['id'] = $this->session->userdata('user_id');
 		$dados['msg'] = $msg;
+
+		$this->load->view('header', $dados);
+		$this->load->view('menu', $dados);
 		$this->load->view('mensagens', $dados);
+		$this->load->view('footer');
 	}
 
 	public function ler_msg()
@@ -154,7 +158,11 @@ class Pagina extends CI_Controller
 		$dados['user'] = $this->session->userdata('user_name');
 		$dados['id'] = $this->session->userdata('user_id');
 		$dados['msg'] = $msg;
+
+		$this->load->view('header', $dados);
+		$this->load->view('menu', $dados);
 		$this->load->view('ler_msg', $dados);
+		$this->load->view('footer');
 	}
 
 	public function ler_rasc()
@@ -200,7 +208,11 @@ class Pagina extends CI_Controller
 		$dados['user'] = $this->session->userdata('user_name');
 		$dados['id'] = $this->session->userdata('user_id');
 		$dados['msg'] = $msg;
+
+		$this->load->view('header', $dados);
+		$this->load->view('menu', $dados);
 		$this->load->view($page, $dados);
+		$this->load->view('footer');
 	}
 
 	public function lixeira()
@@ -239,7 +251,11 @@ class Pagina extends CI_Controller
 		$dados['user'] = $this->session->userdata('user_name');
 		$dados['id'] = $this->session->userdata('user_id');
 		$dados['msg'] = $msg;
+
+		$this->load->view('header', $dados);
+		$this->load->view('menu', $dados);
 		$this->load->view('lixeira', $dados);
+		$this->load->view('footer');
 	}
 
 	public function enviadas()
@@ -277,7 +293,11 @@ class Pagina extends CI_Controller
 		$dados['user'] = $this->session->userdata('user_name');
 		$dados['id'] = $this->session->userdata('user_id');
 		$dados['msg'] = $msg;
+
+		$this->load->view('header', $dados);
+		$this->load->view('menu', $dados);
 		$this->load->view('enviadas', $dados);
+		$this->load->view('footer');
 	}
 
 	public function escrever()
@@ -331,7 +351,11 @@ class Pagina extends CI_Controller
 		$dados['logado'] = $this->session->userdata('user_acess');
 		$dados['user'] = $this->session->userdata('user_name');
 		$dados['id'] = $this->session->userdata('user_id');
+
+		$this->load->view('header', $dados);
+		$this->load->view('menu', $dados);
 		$this->load->view('escrever', $dados);
+		$this->load->view('footer');
 	}
 
 	public function rascunhos()
@@ -364,7 +388,11 @@ class Pagina extends CI_Controller
 		$dados['user'] = $this->session->userdata('user_name');
 		$dados['id'] = $this->session->userdata('user_id');
 		$dados['msg'] = $msg;
+
+		$this->load->view('header', $dados);
+		$this->load->view('menu', $dados);
 		$this->load->view('rascunho', $dados);
+		$this->load->view('footer');
 	}
 
 	public function contatos()
@@ -376,7 +404,11 @@ class Pagina extends CI_Controller
 		$dados['logado'] = $this->session->userdata('user_login');
 		$dados['lista'] = $this->BDusuario->select();
 		$dados['user'] = $this->session->userdata('user_name');
+
+		$this->load->view('header', $dados);
+		$this->load->view('menu', $dados);
 		$this->load->view('contatos', $dados);
+		$this->load->view('footer');
 	}
 
 	public function excluir()
@@ -410,7 +442,11 @@ class Pagina extends CI_Controller
 		$dados['titulo'] = 'All tech';
 		$dados['access'] = $this->session->userdata('user_acess');
 		$dados['user'] = $this->session->userdata('user_name');
+
+		$this->load->view('header', $dados);
+		$this->load->view('menu', $dados);
 		$this->load->view('credenciais', $dados);
+		$this->load->view('footer');
 	}
 
 	public function editar()
@@ -427,7 +463,11 @@ class Pagina extends CI_Controller
 		$dados['h2'] = 'Informações do Usuário';
 		$dados['titulo'] = 'All tech';
 		$dados['access'] = $this->session->userdata('user_acess');
+
+		$this->load->view('header', $dados);
+		$this->load->view('menu', $dados);
 		$this->load->view('editar', $dados);
+		$this->load->view('footer');
 	}
 
 	public function gravar_editar()

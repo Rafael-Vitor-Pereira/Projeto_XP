@@ -120,19 +120,17 @@ class Usuario_model extends CI_Model
     }
   }
 
-	public function selectid($campo, $valor)
+	public function delete($id)
   {
-    $this->db
-      ->select('id')
-      ->from('usuario')
-      ->where($campo, $valor);
+		$result = $this->db->where('remetente', (int)$id)
+			->delete('mensagens');
 
-    $result = $this->db->get();
+		$result = $this->db->where('destinatario', (int)$id)
+			->delete('mensagens');
+		
+    $result = $this->db->where('id', (int)$id)
+      ->delete('usuario');
 
-    if ($result->num_rows() > 0) {
-      return $result->row();
-    } else {
-      return 0;
-    }
+    return $result;		
   }
 }

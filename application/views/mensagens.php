@@ -1,21 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-  <!-- icheck bootstrap -->
-  <link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-  <?php
-  $this->load->view('header');
-  if ($logado == 'admin') {
-    $this->load->view('admin/menu');
-  } else if ($logado == 'chefe de RH') {
-    $this->load->view('rh/menu');
-  } else if ($logado == 'chefe de estoque') {
-    $this->load->view('estoque/menu');
-  } else if ($logado == 'chefe de finanças') {
-    $this->load->view('financas/menu');
-  }
-  ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <br>
@@ -141,12 +123,6 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-  <?php $this->load->view('footer'); ?>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-  <!-- AdminLTE App -->
-  <script src="<?= base_url('assets/') ?>dist/js/adminlte.min.js"></script>
-  <!-- AdminLTE for demo purposes -->
-  <script src="<?= base_url('assets/') ?>dist/js/demo.js"></script>
   <!-- Page specific script -->
   <script>
     $(function() {

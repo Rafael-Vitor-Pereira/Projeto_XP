@@ -1,23 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-  <!-- DataTables -->
-  <link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-  <link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-  <?php
-  $this->load->view('header');
-  if ($access == 'admin') {
-    $this->load->view('admin/menu');
-  } else if ($access == 'chefe de RH') {
-    $this->load->view('rh/menu');
-  } else if ($access == 'chefe de estoque') {
-    $this->load->view('estoque/menu');
-  } else if ($access == 'chefe de finanças') {
-    $this->load->view('financas/menu');
-  }
-  ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <br><br>
@@ -80,39 +60,8 @@
     </section>
     <!-- /.content -->
   </div>
-  <!-- /.content-wrapper -->
-  <footer class="main-footer">
-    <strong>&copy; <?php date('Y'); ?> RVTech, todos os direitos reservados</strong>
-    <div class="float-right d-none d-sm-inline-block">
-      <b>Version</b> 1.0.0
-    </div>
-  </footer>
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <!-- jQuery UI 1.11.4 -->
-  <script src="<?php echo base_url("assets/"); ?>plugins/jquery-ui/jquery-ui.min.js"></script>
-  <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+  
   <script>
-    $.widget.bridge('uibutton', $.ui.button)
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-  <!-- Page specific script -->
-
-  <script>
-    function mascara_tel(tel) {
-      if (tel.value.length == 0)
-        tel.value = '(' + tel.value;
-      if (tel.value.length == 3) tel.value = tel.value + ') ';
-      if (tel.value.length == 6) tel.value = tel.value + ' ';
-      if (tel.value.length == 11) tel.value = tel.value + '-';
-    }
-
-    function mascara_cpf(cpf) {
-      if (cpf.value.length == 3) cpf.value = cpf.value + '.';
-      if (cpf.value.length == 7) cpf.value = cpf.value + '.';
-      if (cpf.value.length == 11) cpf.value = cpf.value + '-';
-    }
-
     //definindo regras de validação de formulário 
     $('#ajaxform').validate({
       rules: {

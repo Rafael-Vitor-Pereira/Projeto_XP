@@ -1,23 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-  <!-- DataTables -->
-  <link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-  <link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-  <?php
-  $this->load->view('header');
-  if ($logado == 'admin') {
-    $this->load->view('admin/menu');
-  } else if ($logado == 'chefe de RH') {
-    $this->load->view('rh/menu');
-  } else if ($logado == 'chefe de estoque') {
-    $this->load->view('estoque/menu');
-  } else if ($logado == 'chefe de finanças') {
-    $this->load->view('financas/menu');
-  }
-  ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <br>
@@ -75,25 +55,7 @@
   <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-  <?php $this->load->view('footer'); ?>
-  <!-- jquery-validation -->
-  <script src="<?php echo base_url("application/views/"); ?>plugins/jquery-validation/jquery.validate.min.js"></script>
-  <script src="<?php echo base_url("application/views/"); ?>plugins/jquery-validation/additional-methods.min.js"></script>
   <script>
-    function mascara_tel(tel) {
-      if (tel.value.length == 0)
-        tel.value = '(' + tel.value;
-      if (tel.value.length == 3) tel.value = tel.value + ') ';
-      if (tel.value.length == 6) tel.value = tel.value + ' ';
-      if (tel.value.length == 11) tel.value = tel.value + '-';
-    }
-
-    function mascara_cpf(cpf) {
-      if (cpf.value.length == 3) cpf.value = cpf.value + '.';
-      if (cpf.value.length == 7) cpf.value = cpf.value + '.';
-      if (cpf.value.length == 11) cpf.value = cpf.value + '-';
-    }
-
     //definindo regras de validação de formulário 
     $('#ajaxform').validate({
       rules: {

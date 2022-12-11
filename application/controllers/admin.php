@@ -9,7 +9,6 @@ class Admin extends CI_Controller
     parent::__construct();
     $this->load->model('vendas_model', 'BDvendas');
 		$this->load->model('custo_model', 'BDcusto');
-		$this->load->model('entrada_model', 'BDentradas');
 		$this->load->model('caixa_model', 'BDcaixa');
 		$this->load->model('funcionario_model', 'BDfuncionario');
 		$this->load->model('produto_model', 'BDproduto');
@@ -89,99 +88,6 @@ class Admin extends CI_Controller
     }
   }
 
-  public function cad_prod()
-  {
-    verifica_login();
-
-    $dados['titulo'] = 'All tech';
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/cad_prod', $dados);
-  }
-
-  public function grava_prod()
-  {
-    verifica_login();
-
-    $regras = array(
-      array('field' => 'produto', 'label' => 'Produto', 'rules' => 'trim|required|max_length[80]'),
-      array('field' => 'estoque', 'label' => 'Estoque', 'rules' => 'trim|required|min_length[1]'),
-      array('field' => 'preco', 'label' => 'Preço', 'rules' => 'trim|required|min_length[2]'),
-    );
-    $this->form_validation->set_rules($regras);
-
-    if ($this->form_validation->run() == FALSE) {
-      $this->load->view('error');
-    } else {
-      //cria vetor para encaminhar informações
-      $dados = array(
-        'produto' => $this->input->post('produto'),
-        'estoque' => intval($this->input->post('estoque')),
-        'preco' => floatval($this->input->post('preco')),
-      );
-      $this->BDproduto->insert($dados);
-
-      $retorno["msg"] = "Cadastro efetuado com sucesso!";
-
-      $this->load->view('success', $retorno);
-    }
-  }
-
-  public function grava_venda()
-  {
-    verifica_login();
-
-    $prod = $this->BDproduto->dados($this->input->post('produto'));
-
-    $regras = array(
-      array('field' => 'produto', 'label' => 'Produto', 'rules' => 'trim|required'),
-      array('field' => 'quantidade', 'label' => 'Quantidade', 'rules' => 'trim|required|min_length[2]')
-    );
-    $this->form_validation->set_rules($regras);
-
-    if ($this->form_validation->run() == FALSE) {
-      $this->load->view('error');
-    } else {
-      if ($prod->estoque >= $this->input->post('quantidade')) {
-        //cria vetor para encaminhar informações
-        $dados = array(
-          'id_prod' => $this->input->post('produto'),
-          'quant' => intval($this->input->post('quantidade')),
-          'valor' => floatval($prod->preco * $this->input->post('quantidade')),
-        );
-        $atualiza = array(
-          'id' => $this->input->post('produto'),
-          'estoque' => $prod->estoque - $this->input->post('quantidade')
-        );
-        $entrada = array(
-          'cod' => 2,
-          'valor' => floatval($prod->preco * $this->input->post('quantidade'))
-        );
-        $this->BDvendas->insert($dados);
-        $this->BDentradas->insert($entrada);
-        $this->BDproduto->update($atualiza);
-
-        $retorno["msg"] = "Cadastro efetuado com sucesso!";
-
-        $this->load->view('success', $retorno);
-      } else {
-        echo '<div class="alert alert-warning alert-dismissible">';
-        echo '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>';
-        echo '<h4><i class="icon fa fa-warning"></i> Aten&ccedil;&atilde;o!</h4>';
-        echo "Estoque do produto insuficiente para esta venda";
-        echo '</div>';
-      }
-    }
-  }
-
-  public function vender()
-  {
-    $dados['titulo'] = 'All tech';
-    $dados['h2'] = 'Cadastro de venda de produtos';
-    $dados['prod'] = $this->BDproduto->select();
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/vender', $dados);
-  }
-
   public function vendas()
   {
     verifica_login();
@@ -211,51 +117,6 @@ class Admin extends CI_Controller
     $dados['h2'] = 'Lista de Vendas Diária';
     $dados['teste'] = 'diario';
     $this->load->view('admin/vendas', $dados);
-  }
-
-  public function editar($id)
-  {
-    $dados['func'] = $this->BDfuncionario->dados($id);
-    $dados['titulo'] = 'All tech';
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/editar', $dados);
-  }
-
-  public function gravar_editar()
-  {
-    verifica_login();
-
-    $dados['func'] = $this->BDfuncionario->dados($this->input->post('id'));
-    //VERIFICAR REGRAS QUE SERAO UTILIZADAS
-    $regras = array(
-      array('field' => 'nome', 'label' => 'Nome', 'rules' => 'trim|required|min_length[3]|max_length[80]'),
-      array('field' => 'sobrenome', 'label' => 'Sobrenome', 'rules' => 'trim|required|min_length[3]'),
-      array('field' => 'email', 'label' => 'E-mail', 'rules' => 'trim|valid_email|required|max_length[255]'),
-      array('field' => 'telefone', 'label' => 'Telefone', 'rules' => 'trim|required|min_length[16]|max_length[16]'),
-      array('field' => 'endereco', 'label' => 'Endereço', 'rules' => 'trim|required|min_length[10]'),
-      array('field' => 'setor', 'label' => 'Setor', 'rules' => 'trim|required|min_length[2]|max_length[15]')
-    );
-    $this->form_validation->set_rules($regras);
-
-    if ($this->form_validation->run() == FALSE) {
-      $this->load->view('error');
-    } else {
-      //cria vetor para encaminhar informações
-      $dados = array(
-        'nome'   => mb_strtoupper($this->input->post('nome'), 'UTF-8'),
-        'sobrenome'  => mb_strtoupper($this->input->post('sobrenome'), 'UTF-8'),
-        'email'  => $this->input->post('email'),
-        'telefone' => $this->input->post('telefone'),
-        'endereco' => $this->input->post('endereco'),
-        'setor' => $this->input->post('setor'),
-        'id' => $this->input->post('id')
-      );
-      $this->BDfuncionario->update($dados);
-
-      $retorno["msg"] = "Cadastro alterado com sucesso!";
-
-      $this->load->view('success_noreset', $retorno);
-    }
   }
 
   public function vendas_mensal()
@@ -325,33 +186,5 @@ class Admin extends CI_Controller
     $dados['capital'] = $capital;
     $dados['user'] = $this->session->userdata('user_name');
     $this->load->view('admin/balanco', $dados);
-  }
-
-  public function produtos()
-  {
-    $dados['titulo'] = 'All tech';
-    $dados['h2'] = 'Lista de Produtos em estoque';
-    $dados['prod'] = $this->BDproduto->select();
-    $dados['user'] = $this->session->userdata('user_name');
-    $this->load->view('admin/produtos', $dados);
-  }
-
-  public function gravar_status()
-  {
-    verifica_login();
-
-    $id = $this->input->post('id');
-    $status = $this->BDusuario->TransacaoStatus($id);
-    if ($status->status) {
-      $dados['status'] = 0;
-      $dados['id'] = $id;
-      $this->BDusuario->update($dados);
-      echo "<i class='fa fa-toggle-off'></i> Inativo";
-    } else {
-      $dados['status'] = 1;
-      $dados['id'] = $id;
-      $this->BDusuario->update($dados);
-      echo "<i class='fa fa-toggle-on'></i> Ativo";
-    }
   }
 }

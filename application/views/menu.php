@@ -77,13 +77,13 @@
           					</a>
 	          				<ul class="nav nav-treeview">
   	          					<li class="nav-item">
-    	          					<a href="<?= base_url('produto/cadastrar'); ?>" class="nav-link">
+    	          					<a href="<?= base_url('produtos/cadastrar'); ?>" class="nav-link">
       	          						<i class="far fa-circle nav-icon"></i>
         	        					<p>Cadastrar</p>
           	    					</a>
             					</li>
 								<li class="nav-item">
-  	            					<a href="<?= base_url('produto/listar'); ?>" class="nav-link">
+  	            					<a href="<?= base_url('produtos/listar'); ?>" class="nav-link">
     	            					<i class="far fa-circle nav-icon"></i>
       	          						<p>Listar/Buscar</p>
         	      					</a>
@@ -132,13 +132,6 @@
           	  					</li>
 							</ul>
 						</li>
-					<?php } if(($this->session->userdata('user_acess') == 'admin')){ ?>
-  	      				<li class="nav-item">
-    	      				<a href="<?= base_url('admin/bloquear'); ?>" class="nav-link">
-								<i class="nav-icon fa fa-ban"></i>
-        	    				<p>Bloquear usuário</p>
-	          				</a>
-  	      				</li>
 					<?php } ?>
     	  			<li class="nav-item">
           				<a href="<?= base_url('pagina/contatos'); ?>" class="nav-link">

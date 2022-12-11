@@ -88,4 +88,15 @@ class Produto_model extends CI_Model
     $this->db->update('produtos', $dados);
     return $this->db->affected_rows();
   }
+
+	public function delete($id)
+  {
+		$result = $this->db->where('id_prod', (int)$id)
+			->delete('vendas');
+		
+    $result = $this->db->where('id', (int)$id)
+      ->delete('produtos');
+
+    return $result;		
+  }
 }

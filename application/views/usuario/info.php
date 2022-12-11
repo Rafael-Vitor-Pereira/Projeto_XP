@@ -15,22 +15,22 @@
               				<div class="card-body">
                 				<table id="informacoes" class="table table-bordered table-striped">
                     				<tr>
-                      					<th colspan="2">Nome</th>
+                      					<th colspan="3">Nome</th>
                       					<th>Telefone</th>
 										<th>E-mail</th>
 									</tr>
 									<tr>
-										<td colspan="2"><?= $dados->nome . ' ' . $dados->sobrenome ?></td>
+										<td colspan="3"><?= $dados->nome . ' ' . $dados->sobrenome ?></td>
                           				<td><?= $dados->telefone ?></td>
                           				<td><?= $dados->email ?></td>
 									</tr>
 									<tr>
-										<th colspan="2">Logradouro</th>
+										<th colspan="3">Logradouro</th>
 										<th>Número</th>
 										<th>Complemento</th>
 									</tr>
 									<tr>
-										<td colspan="2"><?= $dados->logradouro ?></td>
+										<td colspan="3"><?= $dados->logradouro ?></td>
 										<td><?= $dados->numero ?></td>
 										<td><?= $dados->complemento ?></td>
 									</tr>
@@ -38,13 +38,15 @@
 										<th>Bairro</th>
 										<th>Cidade</th>
 										<th>Estado</th>
-                      					<th>Setor</th>
+                      					<th>Acesso</th>
+										<th>Login</th>
                     				</tr>
 									<tr>
 										<td><?= $dados->bairro ?></td>
 										<td><?= $dados->cidade ?></td>
 										<td><?= $dados->estado ?></td>
-										<td><?= $dados->setor ?></td>
+										<td><?= $dados->acesso ?></td>
+										<td><?= $dados->login ?></td>
 									</tr>
                 				</table>
               				</div><!-- /.card-body -->
