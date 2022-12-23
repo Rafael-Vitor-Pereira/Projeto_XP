@@ -16,21 +16,10 @@
 	<link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+	<link rel="stylesheet" href="<?= base_url('assets/') ?>plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
 
 	<script src="<?= base_url('assets/') ?>js/jquery.js"></script>
 </head>
-  <?php
-  if ($this->session->userdata('user_acess') == 'admin') {
-    $rota = 'admin';
-  } else if ($this->session->userdata('user_acess') == 'chefe de RH') {
-    $rota = 'rh';
-  } else if ($this->session->userdata('user_acess') == 'chefe de estoque') {
-    $rota = 'estoque';
-  } else if ($this->session->userdata('user_acess') == 'chefe de finanças') {
-    $rota = 'financeiro';
-  }
-  ?>
-
   <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
     <div class="wrapper">
       <!-- Navbar -->
@@ -41,7 +30,7 @@
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
           </li>
           <li class="nav-item d-none d-sm-inline-block">
-            <a href="<?= base_url($rota) ?>" class="nav-link">Home</a>
+            <a href="<?= base_url('pagina/dashboard') ?>" class="nav-link">Home</a>
           </li>
         </ul>
         <!-- Right navbar links -->

@@ -18,39 +18,6 @@ class Admin extends CI_Controller
     date_default_timezone_get();
   }
 
-  public function index()
-  {
-    verifica_login();
-
-    $somaCapital = $this->BDentradas->countValores(date('Y-m'));
-    $somaCusto = $this->BDcusto->countValores(date('Y-m'));
-
-		$info['lucro'] = $somaCapital->valor - $somaCusto->valor;
-    $info['teste'] = $this->BDcaixa->select(date('M'));
-		
-		$retorno = fecha_caixa($info);
-
-		if($retorno['retorno']){
-			$this->BDcaixa->insert($retorno['dados']);
-		}
-
-    $dados['vendas'] = $this->BDvendas->count(date('Y-m-d'));
-    $dados['vendas_mensal'] = $this->BDvendas->countMensal(date('Y-m'));
-    $dados['prod'] = $this->BDproduto->count();
-    $dados['lucro'] = $info['lucro'];
-    $dados['caixa'] = $this->BDcaixa->sum();
-    $dados['custo'] = $somaCusto;
-    $dados['valor_diario'] = $this->BDcusto->countDiario(date('Y-m-d'));
-    $dados['valor_mensal'] = $somaCusto;
-    $dados['func'] = $this->BDfuncionario->count();
-    $dados['titulo'] = 'All tech';
-    $dados['user'] = $this->session->userdata('user_name');
-    $dados['tarefas'] = $this->BDtarefa->select($this->session->userdata('user_id'));
-    $dados['h2'] = 'Setor Administrativo';
-
-    $this->load->view('admin/dashboard', $dados);
-  }
-
   public function inserirTarefa()
   {
     verifica_login();
@@ -86,68 +53,6 @@ class Admin extends CI_Controller
         echo '</div>';
       }
     }
-  }
-
-  public function vendas()
-  {
-    verifica_login();
-
-    $vendas = $this->BDvendas->select(date('Y-m-d'));
-    if ($vendas != 0) {
-      $x = 0;
-      foreach ($vendas as $linha) {
-        $produtos = $this->BDproduto->selectPorId($linha->id_prod);
-        $lista = array(
-          'produto' => $produtos->produto,
-          'valor_unit' => floatval($produtos->preco),
-          'codigo' => intval($vendas[$x]->id_venda),
-          'quant' => intval($vendas[$x]->quant),
-          'total' => floatval($vendas[$x]->valor),
-          'data' => $vendas[$x]->data
-        );
-        $dados['lista'][$x] = $lista;
-        $x++;
-      }
-    } else {
-      $dados['lista'] = '';
-    }
-
-    $dados['titulo'] = 'All tech';
-    $dados['user'] = $this->session->userdata('user_name');
-    $dados['h2'] = 'Lista de Vendas Diária';
-    $dados['teste'] = 'diario';
-    $this->load->view('admin/vendas', $dados);
-  }
-
-  public function vendas_mensal()
-  {
-    verifica_login();
-
-    $vendas = $this->BDvendas->intervalo(date('Y-m'));
-    if ($vendas != 0) {
-      $x = 0;
-      foreach ($vendas as $linha) {
-        $produtos = $this->BDproduto->selectPorId($linha->id_prod);
-        $lista = array(
-          'produto' => $produtos->produto,
-          'valor_unit' => floatval($produtos->preco),
-          'codigo' => intval($linha->id_venda),
-          'quant' => intval($linha->quant),
-          'total' => floatval($linha->valor),
-          'data' => $linha->data
-        );
-        $dados['lista'][$x] = $lista;
-        $x++;
-      }
-    } else {
-      $dados['lista'] = '';
-    }
-
-    $dados['titulo'] = 'All tech';
-    $dados['user'] = $this->session->userdata('user_name');
-    $dados['h2'] = 'Lista de Vendas Mensal';
-    $dados['teste'] = 'mensal';
-    $this->load->view('admin/vendas', $dados);
   }
 
   public function balanco()

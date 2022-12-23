@@ -23,11 +23,11 @@
 									</thead>
 									<tbody>
 										<?php
-										if ($dados != 0) {
+										if (!is_null($dados)) {
 											$x = 0;
 											foreach ($dados as $linha) {
 											?>
-												<tr id="linha<?php echo $linha->id_venda ?>">
+												<tr id="linha<?= $linha->id_venda ?>">
 													<td><?= $linha->id_prod ?></td>
 													<td><?= $linha->quant ?></td>
 													<td><?= $linha->valor ?></td>
@@ -45,11 +45,11 @@
 												</tr>
 											<?php
 											}
-											} else {
+                                        } else {
 											?>
 											<tr>
 												<td colspan="8">
-												<center>Não há produtos cadastrados</center>
+												<center>Não há vendas cadastrados</center>
 												</td>
 											</tr>
 										<?php } ?>

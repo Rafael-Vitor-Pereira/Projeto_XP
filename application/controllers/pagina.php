@@ -7,8 +7,14 @@ class Pagina extends CI_Controller
 	function __construct()
 	{
 		parent::__construct();
+		$this->load->model('caixa_model', 'BDcaixa');
+		$this->load->model('custo_model', 'BDcusto');
+		$this->load->model('vendas_model', 'BDvendas');
+		$this->load->model('tarefa_model', 'BDtarefa');
 		$this->load->model('usuario_model', 'BDusuario');
+		$this->load->model('produto_model', 'BDproduto');
 		$this->load->model('mensagem_model', 'BDmensagem');
+		$this->load->model('funcionario_model', 'BDfuncionario');
 		date_default_timezone_set('america/sao_paulo');
 		date_default_timezone_get();
 	}
@@ -35,15 +41,7 @@ class Pagina extends CI_Controller
 						$dados['login'] = $dados_form;
 						logar($dados);
 						//fazer redirect para dashboard do sistema
-						if ($this->session->userdata('user_acess') == 'admin') {
-							redirect('admin/index', 'refresh');
-						} else if ($this->session->userdata('user_acess') == 'chefe de estoque') {
-							redirect('estoque/index', 'refresh');
-						} else if ($this->session->userdata('user_acess') == 'chefe de RH') {
-							redirect('rh/index', 'refresh');
-						} else if ($this->session->userdata('user_acess') == 'chefe de finanças') {
-							redirect('financeiro/index', 'refresh');
-						}
+						redirect('pagina/dashboard', 'refresh');
 					} else {
 						//senha incorreta
 						set_msg('<p>Usuário ou Senha incorreto!</p>');
@@ -63,15 +61,7 @@ class Pagina extends CI_Controller
 				$dados['dados'] = $result; 
 				$dados['login'] = $cookie;
 				logar($dados);
-				if ($this->session->userdata('user_acess') == 'admin') {
-					redirect('admin/index', 'refresh');
-				} else if ($this->session->userdata('user_acess') == 'chefe de estoque') {
-					redirect('estoque/index', 'refresh');
-				} else if ($this->session->userdata('user_acess') == 'chefe de RH') {
-					redirect('rh/index', 'refresh');
-				} else if ($this->session->userdata('user_acess') == 'chefe de finanças') {
-					redirect('financeiro/index', 'refresh');
-				}
+				redirect('pagina/dashboard', 'refresh');
 			}
 		} else {
 			//Carrega view
@@ -81,45 +71,40 @@ class Pagina extends CI_Controller
 		}
 	}
 
-	public function mensagens()
-	{
+	public function dashboard(){
 		verifica_login();
 
-		$dados_msg = $this->BDmensagem->listar($this->session->userdata('user_id'));
-		if ($dados_msg != 0) {
-			$x = 0;
-			foreach ($dados_msg as $linha) {
-				$dados_remet = $this->BDusuario->dados($linha->remetente);
-				$dados_dest = $this->BDusuario->dados($linha->destinatario);
-				if($linha->tipo == 'enviada'){
-					$msg[$x] = array(
-						'nome_remet' => $dados_remet->acesso,
-						'email_remet' => $dados_remet->email,
-						'nome_dest' => $dados_dest->nome,
-						'email_dest' => $dados_dest->email,
-						'destinatario' => $linha->destinatario,
-						'titulo' => $linha->titulo,
-						'conteudo' => $linha->conteudo,
-						'data' => $linha->data,
-						'hora' => $linha->hora,
-						'id' => $linha->id
-					);
-				}
-				$x++;
-			}
-		} else {
-			$msg = 0;
-		}
-		$dados['titulo'] = 'All tech';
-		$dados['h2'] = 'Caixa de entrada';
-		$dados['logado'] = $this->session->userdata('user_acess');
-		$dados['user'] = $this->session->userdata('user_name');
-		$dados['id'] = $this->session->userdata('user_id');
-		$dados['msg'] = $msg;
+    	$somaCapital = $this->BDvendas->countValores(date('Y-m'));
+    	$somaCusto = $this->BDcusto->countValores(date('Y-m'));
 
-		$this->load->view('header', $dados);
-		$this->load->view('menu', $dados);
-		$this->load->view('mensagens', $dados);
+		$info['lucro'] = $somaCapital->valor - $somaCusto->valor;
+    	$info['teste'] = $this->BDcaixa->select(date('M'));
+		
+		$retorno = fecha_caixa($info);
+
+		if($retorno['retorno']){
+			$this->BDcaixa->insert($retorno['dados']);
+		}
+
+	    $dados['vendas'] = $this->BDvendas->count(date('Y-m-d'));
+    	$dados['vendas_mensal'] = $this->BDvendas->countMensal(date('Y-m'));
+	    $dados['prod'] = $this->BDproduto->count();
+    	$dados['lucro'] = $info['lucro'];
+	    $dados['caixa'] = $this->BDcaixa->sum();
+    	$dados['custo'] = $somaCusto;
+	    $dados['valor_diario'] = $this->BDcusto->countDiario(date('Y-m-d'));
+    	$dados['valor_mensal'] = $somaCusto;
+	    $dados['func'] = $this->BDfuncionario->count();
+    	$dados['titulo'] = 'All tech';
+	    $dados['user'] = $this->session->userdata('user_name');
+    	$dados['tarefas'] = $this->BDtarefa->select($this->session->userdata('user_id'));
+	    $dados['h2'] = 'Setor Administrativo';
+
+		$titulo['titulo'] = 'All Tech - Dashboard';
+
+		$this->load->view('header', $titulo);
+		$this->load->view('menu');
+    	$this->load->view('dashboard', $dados);
 		$this->load->view('footer');
 	}
 

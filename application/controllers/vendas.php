@@ -86,6 +86,40 @@ class Vendas extends CI_Controller
 		$this->load->view('footer');
 	}
 
+	public function listarDiario(){
+		$titulo['titulo'] = "All Tech";
+		$dados['dados'] = $this->BDvendas->select(date('Y-m-d'));
+
+		if(!is_null($dados['dados'])){
+			foreach($dados['dados'] as $linha){
+				$produto = $this->BDproduto->dados($linha->id_prod);
+				$linha->id_prod = $produto->produto;
+			}
+		}
+
+		$this->load->view('header', $titulo);
+		$this->load->view('menu', $titulo);
+		$this->load->view('vendas/listar', $dados);
+		$this->load->view('footer');
+	}
+
+	public function listarMensal(){
+		$titulo['titulo'] = "All Tech";
+		$dados['dados'] = $this->BDvendas->intervalo(date('Y-m'));
+
+		if(!is_null($dados['dados'])){
+			foreach($dados['dados'] as $linha){
+				$produto = $this->BDproduto->dados($linha->id_prod);
+				$linha->id_prod = $produto->produto;
+			}
+		}
+
+		$this->load->view('header', $titulo);
+		//$this->load->view('menu', $titulo);
+		$this->load->view('vendas/listar', $dados);
+		$this->load->view('footer');
+	}
+
 	public function editar($id){
 		$dados['dados'] = $this->BDvendas->dados($id);
 		$dados['produtos'] = $this->BDproduto->select();

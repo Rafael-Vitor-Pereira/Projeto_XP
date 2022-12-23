@@ -3,7 +3,7 @@
   		<!-- Brand Logo -->
   		<a href="<?= base_url('admin'); ?>" class="brand-link" style="text-decoration: none;">
     		<img src="<?= base_url('assets/dist/img/AdminLTELogo.png'); ?>" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-    		<span class="brand-text font-weight-light"><?= $titulo ?></span>
+    		<span class="brand-text font-weight-light">All Tech</span>
   		</a>
 
   		<!-- Sidebar -->
@@ -140,7 +140,7 @@
           				</a>
         			</li>
         			<li class="nav-item">
-          				<a href="<?= base_url('pagina/mensagens'); ?>" class="nav-link">
+          				<a href="<?= base_url('mensagens'); ?>" class="nav-link">
             				<i class="nav-icon far fa-envelope"></i>
             				<p>Mensagens</p>
           				</a>

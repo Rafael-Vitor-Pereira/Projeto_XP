@@ -88,6 +88,21 @@ class Vendas_model extends CI_Model
     }
 	}
 
+	public function countValores($data){
+		$this->db
+      ->select('SUM(valor) AS valor')
+      ->from('vendas')
+      ->where('"' . $data . '-01" <= data AND data <= "' . $data . '-31"');
+
+    $result = $this->db->get();
+
+    if ($result->num_rows() > 0) {
+      return $result->row();
+    } else {
+      return 0;
+    }
+	}
+
 	public function intervalo($data)
   {
     $this->db
@@ -100,7 +115,7 @@ class Vendas_model extends CI_Model
     if ($result->num_rows() > 0) {
       return $result->result();
     } else {
-      return 0;
+      return null;
     }
   }
 
